@@ -19,9 +19,11 @@ public class Day {
     @Column(nullable = false)
     boolean[] hours;
 
+    @Column(nullable = false)
     Date date;
 
     public Day() {
         hours = new boolean[8];
+        date = new Date();
     }
 }
