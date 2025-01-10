@@ -1,30 +1,43 @@
 package com.example.SiteCercolaFioravante.user;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.example.SiteCercolaFioravante.reservation.Reservation;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+
+import java.util.LinkedList;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "email")
-})
+
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue( strategy = GenerationType.SEQUENCE )
     private Long id;
 
-    private String username;
+    @NotNull
+    @Column( nullable = false )
+    private String surname;
+
+    @NotNull
+    @Column( nullable = false )
     private String name;
+
+    @Column( unique = true )
     private String email;
+
+    @NotNull
+    @Column( nullable = false )
     private String role;
+
+    @NotNull
+    @Column( nullable = false, length = 10)
+    private int phoneNumber;
+
+    @OneToMany( mappedBy = "user", cascade = CascadeType.ALL )
+    private LinkedList<Reservation> reservations;
 
 
 }
