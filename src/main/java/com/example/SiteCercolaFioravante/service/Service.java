@@ -3,20 +3,14 @@ package com.example.SiteCercolaFioravante.service;
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Array;
 
 import java.util.LinkedList;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
-
 public class Service {
 
     @Id
@@ -25,7 +19,7 @@ public class Service {
 
     @NotNull
     @Column( nullable = false, unique = true )
-    private String name;
+    private String serviceName;
 
     @Array( length = 4 )
     private String[] images;
