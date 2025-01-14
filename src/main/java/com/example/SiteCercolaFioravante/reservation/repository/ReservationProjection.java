@@ -1,4 +1,4 @@
-package com.example.SiteCercolaFioravante.reservation;
+package com.example.SiteCercolaFioravante.reservation.repository;
 
 import java.util.Date;
 
@@ -10,10 +10,8 @@ public interface ReservationProjection {
 
     String getSurname();
 
-    boolean getIsCompleted();
-
-    boolean getIsDeletable();
-
     int getHour();
+
+    long getId();
 
 }

@@ -16,10 +16,6 @@ import java.util.LinkedList;
 public class Day {
 
     @Id
-    @GeneratedValue( strategy = GenerationType.SEQUENCE )
-    private long id;
-
-    @Column( nullable = false, unique = true )
     private Date date;
 
     @ColumnDefault( "true" )

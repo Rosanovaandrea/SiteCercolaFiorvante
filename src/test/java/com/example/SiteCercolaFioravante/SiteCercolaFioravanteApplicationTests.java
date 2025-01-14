@@ -4,10 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SiteCercolaFioravanteApplicationTests {
+public class SiteCercolaFioravanteApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
 
 }

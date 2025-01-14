@@ -15,20 +15,20 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "day", "hour" } ) } )
 @Data
 @NoArgsConstructor
+@IdClass(CompositeKeyReservation.class)
 public class Reservation {
 
     @Id
-    @GeneratedValue( strategy = GenerationType.SEQUENCE )
-    private long id;
-
     @ManyToOne
     @JoinColumn( name = "service_id", nullable = false )
     private Service service;
 
+    @Id
     @ManyToOne
     @JoinColumn( name = "user_id", nullable = false )
     private User user;
 
+    @Id
     @ManyToOne
     @JoinColumn( name = "day_id", nullable = false )
     private Day day;

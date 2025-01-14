@@ -14,11 +14,6 @@ import java.util.LinkedList;
 public class Service {
 
     @Id
-    @GeneratedValue( strategy = GenerationType.SEQUENCE )
-    private long id;
-
-    @NotNull
-    @Column( nullable = false, unique = true )
     private String serviceName;
 
     @Array( length = 4 )

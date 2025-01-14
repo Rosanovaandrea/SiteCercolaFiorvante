@@ -13,9 +13,6 @@ import java.util.LinkedList;
 @Entity
 public class User {
 
-    @Id
-    @GeneratedValue( strategy = GenerationType.SEQUENCE )
-    private Long id;
 
     @NotNull
     @Column( nullable = false )
@@ -25,7 +22,7 @@ public class User {
     @Column( nullable = false )
     private String name;
 
-    @Column( unique = true )
+    @Id
     private String email;
 
     @NotNull
@@ -33,8 +30,8 @@ public class User {
     private String role;
 
     @NotNull
-    @Column( nullable = false, length = 10)
-    private int phoneNumber;
+    @Column( nullable = false, length = 10, unique = true)
+    private long phoneNumber;
 
     @OneToMany( mappedBy = "user", cascade = CascadeType.ALL )
     private LinkedList<Reservation> reservations;
