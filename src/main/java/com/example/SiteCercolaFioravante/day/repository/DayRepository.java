@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface DayRepository extends JpaRepository<Day, Long> {
 
-   // @Query("select d.date, d.occupiedHour from Day d WHERE d.date BETWEEN ':start' AND ':end'")
-  //  List<CalendarDayProjection> getDaysByTime(@Param("start") Date start,@Param("end") Date end);
+    @Query("select d.date as date, d.occupiedHour as occupiedHour from Day d WHERE d.date BETWEEN :start AND :end")
+    List<CalendarDayProjection> getDaysByTime(@Param("start") Date start,@Param("end") Date end);
 
 }

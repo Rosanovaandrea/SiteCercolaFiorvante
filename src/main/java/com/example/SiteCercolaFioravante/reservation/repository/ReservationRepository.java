@@ -13,23 +13,23 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Query("SELECT day.date, service.serviceName, user.name, user.surname, e.hour, e.id  FROM Reservation e " +
+    @Query("SELECT day.date as date, service.serviceName as serviceName, ctm.name as name, ctm.surname as surname, e.hour as hour FROM Reservation e " +
             "JOIN e.service serv  " +
-            "JOIN e.user  user " +
+            "JOIN e.customer  ctm " +
             "JOIN e.day day " +
-            "WHERE user.email = :email ")
+            "WHERE ctm.email = :email ")
     List<ReservationProjection> findReservationsByUserNameAndSurname( @Param( "email" ) String email );
 
-    @Query("SELECT day.date, service.serviceName, user.name, user.surname, e.hour, e.id  FROM Reservation e " +
+    @Query("SELECT day.date as date, service.serviceName as serviceName, ctm.name as name, ctm.surname as surname, e.hour as hour FROM Reservation e " +
             "JOIN e.service serv  " +
-            "JOIN e.user  user " +
+            "JOIN e.customer  ctm " +
             "JOIN e.day day " +
             "WHERE serv.serviceName = :serviceName ")
     List<ReservationProjection> findReservationsByServiceName( @Param( "serviceName" ) String serviceName );
 
-    @Query("SELECT day.date, service.serviceName, user.name, user.surname, e.hour, e.id  FROM Reservation e " +
+    @Query("SELECT day.date as date, service.serviceName as serviceName, ctm.name as name, ctm.surname as surname, e.hour as hour  FROM Reservation e " +
             "JOIN e.service serv  " +
-            "JOIN e.user  user " +
+            "JOIN e.customer  ctm " +
             "JOIN e.day day " +
             "WHERE day.date = :date ")
     List<ReservationProjection> findReservationsByDate( @Param( "date" ) Date date );

@@ -1,8 +1,7 @@
-package com.example.SiteCercolaFioravante.user;
+package com.example.SiteCercolaFioravante.customer;
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +10,8 @@ import java.util.LinkedList;
 @Data
 @NoArgsConstructor
 @Entity
-public class User {
+@Table(name="customer")
+public class Customer {
 
 
     @NotNull
@@ -33,7 +33,7 @@ public class User {
     @Column( nullable = false, length = 10, unique = true)
     private long phoneNumber;
 
-    @OneToMany( mappedBy = "user", cascade = CascadeType.ALL )
+    @OneToMany( mappedBy = "customer", cascade = CascadeType.ALL )
     private LinkedList<Reservation> reservations;
 
 

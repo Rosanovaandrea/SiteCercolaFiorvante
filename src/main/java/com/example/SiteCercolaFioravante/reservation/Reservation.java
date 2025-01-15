@@ -3,7 +3,7 @@ package com.example.SiteCercolaFioravante.reservation;
 
 import com.example.SiteCercolaFioravante.day.Day;
 import com.example.SiteCercolaFioravante.service.Service;
-import com.example.SiteCercolaFioravante.user.User;
+import com.example.SiteCercolaFioravante.customer.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -25,8 +25,8 @@ public class Reservation {
 
     @Id
     @ManyToOne
-    @JoinColumn( name = "user_id", nullable = false )
-    private User user;
+    @JoinColumn( name = "customer_id", nullable = false )
+    private Customer customer;
 
     @Id
     @ManyToOne

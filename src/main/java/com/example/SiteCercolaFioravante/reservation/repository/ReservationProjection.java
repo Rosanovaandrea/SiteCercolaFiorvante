@@ -12,6 +12,5 @@ public interface ReservationProjection {
 
     int getHour();
 
-    long getId();
 
 }
