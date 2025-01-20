@@ -13,6 +13,9 @@ import java.util.LinkedList;
 @Table(name="customer")
 public class Customer {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
 
     @NotNull
     @Column( nullable = false )
@@ -22,7 +25,7 @@ public class Customer {
     @Column( nullable = false )
     private String name;
 
-    @Id
+    @Column(unique = true)
     private String email;
 
     @NotNull

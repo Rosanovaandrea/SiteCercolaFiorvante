@@ -10,27 +10,28 @@ import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "day", "hour" } ) } )
 @Data
 @NoArgsConstructor
-@IdClass(CompositeKeyReservation.class)
 public class Reservation {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
+
     @ManyToOne
     @JoinColumn( name = "service_id", nullable = false )
     private Service service;
 
-    @Id
     @ManyToOne
     @JoinColumn( name = "customer_id", nullable = false )
     private Customer customer;
 
-    @Id
     @ManyToOne
-    @JoinColumn( name = "day_id", nullable = false )
+    @JoinColumn( name = "day_date", nullable = false )
     private Day day;
 
     @ColumnDefault( "false" )
