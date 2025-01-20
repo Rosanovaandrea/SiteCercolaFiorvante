@@ -4,6 +4,7 @@ import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerProjectionList;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerProjectionSingle;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
+import com.example.SiteCercolaFioravante.customer.services.CustomerDtoComplete;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,8 +65,8 @@ public class CustomerRepositoryTest {
     @Test
     void givenUser_whenSaved_thenCanBeFoundByPhoneNumber() {
 
-        CustomerProjectionList savedUser = customerRepository.getCustomerByPhoneNumber(testCustomer.getPhoneNumber()).get(0);
-        assertEquals(testCustomer.getEmail(), savedUser.getEmail());
+        CustomerProjectionSingle savedUser = customerRepository.getCustomerByPhoneNumber(testCustomer.getPhoneNumber());
+        assertEquals(testCustomer.getEmail(), savedUser);
         assertEquals(testCustomer.getName(), savedUser.getName());
     }
 

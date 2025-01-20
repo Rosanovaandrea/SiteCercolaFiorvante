@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Array;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.LinkedList;
 
@@ -25,6 +26,9 @@ public class Service {
 
     @Array( length = 4 )
     private String[] images;
+
+    @ColumnDefault("20.0f")
+    private float price;
 
     @NotNull
     @Column( nullable = false, length = 1500 )
