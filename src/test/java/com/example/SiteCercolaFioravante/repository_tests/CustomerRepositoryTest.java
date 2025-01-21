@@ -1,6 +1,8 @@
 package com.example.SiteCercolaFioravante.repository_tests;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
+import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,25 +45,25 @@ public class CustomerRepositoryTest {
     @Test
     void givenUser_whenSaved_thenCanBeFoundByEmail() {
 
-        CustomerProjectionList savedUser =customerRepository.getCustomerByEmail(testCustomer.getEmail()).get(0);
-        assertEquals(testCustomer.getEmail(), savedUser.getEmail());
-        assertEquals(testCustomer.getName(), savedUser.getName());
+        CustomerDtoList savedUser =customerRepository.getCustomerByEmail(testCustomer.getEmail()).get(0);
+        assertEquals(testCustomer.getEmail(), savedUser.email());
+        assertEquals(testCustomer.getName(), savedUser.name());
     }
 
     @Test
     void givenUser_whenSaved_thenCanBeFoundBynameUsername() {
 
-        CustomerProjectionList savedUser = customerRepository.getCustomerByNameOrSurname(testCustomer.getName()).get(0);
-        assertEquals(testCustomer.getEmail(), savedUser.getEmail());
-        assertEquals(testCustomer.getName(), savedUser.getName());
+        CustomerDtoList savedUser = customerRepository.getCustomerByNameOrSurname(testCustomer.getName()).get(0);
+        assertEquals(testCustomer.getEmail(), savedUser.email());
+        assertEquals(testCustomer.getName(), savedUser.name());
     }
 
     @Test
     void givenUser_whenSaved_thenCanBeFoundByPhoneNumber() {
 
-        CustomerProjectionSingle savedUser = customerRepository.getCustomerByPhoneNumber(testCustomer.getPhoneNumber());
-        assertEquals(testCustomer.getEmail(), savedUser);
-        assertEquals(testCustomer.getName(), savedUser.getName());
+        CustomerDtoSafe savedUser = customerRepository.getCustomerByPhoneNumber(testCustomer.getPhoneNumber());
+        assertEquals(testCustomer.getEmail(), savedUser.email());
+        assertEquals(testCustomer.getName(), savedUser.name());
     }
 
     @AfterEach

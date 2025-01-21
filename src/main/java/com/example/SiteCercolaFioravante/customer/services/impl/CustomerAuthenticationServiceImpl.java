@@ -4,6 +4,7 @@ import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
 import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +26,13 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
     @Override
     public CustomerDtoComplete doLogin(String email, String password) {
+        long id = repository.getCustomerIdFromEmail(email);
+
+        if(id != 0L) System.out.println("error");
+
+        String passwordFromDB = repository.getCustomerPasswordFromEmail(email);
+
+        BCrypt.checkpw(password,passwordFromDB);
 
     }
 

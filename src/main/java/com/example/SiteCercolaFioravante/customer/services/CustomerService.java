@@ -1,15 +1,18 @@
 package com.example.SiteCercolaFioravante.customer.services;
 
+import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
+
 import java.util.List;
 
 
 public interface CustomerService {
 
-    List<CustomerProjectionList> getCustomerByNameOrSurname(String nameSurname);
+    List<CustomerDtoList> getCustomerByNameOrSurname(String nameSurname);
 
-    CustomerProjectionSingle getCustomerByPhoneNumber(long phoneNumber);
+    CustomerDtoSafe getCustomerByPhoneNumber(long phoneNumber);
 
-    List<CustomerProjectionList> getCustomerByEmail(String email);
+    List<CustomerDtoList> getCustomerByEmail(String email);
 
     long getCustomerIdFromEmail(String email);
 }

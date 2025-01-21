@@ -1,5 +1,7 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
+import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -13,17 +15,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     CustomerRepository repository;
     @Override
-    public List<CustomerProjectionList> getCustomerByNameOrSurname(String nameSurname) {
+    public List<CustomerDtoList> getCustomerByNameOrSurname(String nameSurname) {
         return repository.getCustomerByNameOrSurname(nameSurname);
     }
 
     @Override
-    public CustomerProjectionSingle getCustomerByPhoneNumber(long phoneNumber) {
+    public CustomerDtoSafe getCustomerByPhoneNumber(long phoneNumber) {
         return repository.getCustomerByPhoneNumber(phoneNumber);
     }
 
     @Override
-    public List<CustomerProjectionList> getCustomerByEmail(String email) {
+    public List<CustomerDtoList> getCustomerByEmail(String email) {
         return repository.getCustomerByEmail(email);
     }
 
