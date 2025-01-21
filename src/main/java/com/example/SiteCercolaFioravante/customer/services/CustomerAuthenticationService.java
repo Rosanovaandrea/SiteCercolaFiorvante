@@ -1,7 +1,9 @@
 package com.example.SiteCercolaFioravante.customer.services;
 
+import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
+
 public interface CustomerAuthenticationService {
-    CustomerDtoComplete doEmailPasswordReset( String email );
+    CustomerDtoComplete doEmailPasswordReset(String email );
 
     CustomerDtoComplete doPasswordReset( String password );
 

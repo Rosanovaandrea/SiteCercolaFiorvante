@@ -1,7 +1,5 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
-import com.example.SiteCercolaFioravante.customer.repository.CustomerProjectionList;
-import com.example.SiteCercolaFioravante.customer.repository.CustomerProjectionSingle;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import lombok.RequiredArgsConstructor;
