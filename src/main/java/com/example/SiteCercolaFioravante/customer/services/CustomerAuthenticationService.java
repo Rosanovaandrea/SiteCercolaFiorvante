@@ -1,14 +1,15 @@
 package com.example.SiteCercolaFioravante.customer.services;
 
 import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
+import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
 
 public interface CustomerAuthenticationService {
-    CustomerDtoComplete doEmailPasswordReset(String email );
+    CustomerDtoSafe doEmailPasswordReset(String email );
 
-    CustomerDtoComplete doPasswordReset( String password );
+    CustomerDtoSafe doPasswordReset(String password );
 
-    CustomerDtoComplete doLogin(String email, String password);
+    CustomerDtoSafe doLogin(String email, String password);
 
-    CustomerDtoComplete doRegistration(CustomerDtoComplete customer);
+    CustomerDtoSafe doRegistration(CustomerDtoComplete customer);
 
 }

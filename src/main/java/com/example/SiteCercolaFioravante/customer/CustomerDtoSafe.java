@@ -1,9 +1,11 @@
 package com.example.SiteCercolaFioravante.customer;
 
-public record CustomerDtoSafe(String surname,
-                              String name,
-                              String email,
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
-                              String role,
-                              long phoneNumber) {
+public record CustomerDtoSafe(String surname,
+                              @NotNull String name,
+                              @Email String email,
+                              @NotNull  String role,
+                              @NotNull long phoneNumber) {
 }
