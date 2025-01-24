@@ -1,5 +1,7 @@
 package com.example.SiteCercolaFioravante.login;
 
+import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
+import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +19,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JWTAuthFilter extends OncePerRequestFilter {
 
-    private UserAuthProvider userAuthProvider;
+    private static CustomerAuthenticationService userAuthProvider;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -33,13 +36,9 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request,response);
 
             try{
-                if(SecurityContextHolder.getContext() != null){
-                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                    authentication
-                }
-                /*SecurityContextHolder.getContext().setAuthentication(
-                     userAuthProvider.validateToken(elements[1])
-                );*/
+                SecurityContextHolder.getContext().setAuthentication(
+                        userAuthProvider.doAuthentication(elements[1])
+                );
             }catch(RuntimeException e){
                 SecurityContextHolder.clearContext();
                 throw e;

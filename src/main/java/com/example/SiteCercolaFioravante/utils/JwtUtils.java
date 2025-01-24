@@ -1,4 +1,4 @@
-package com.example.SiteCercolaFioravante.login;
+package com.example.SiteCercolaFioravante.utils;
 
 
 
@@ -6,16 +6,19 @@ import com.auth0.jwt.*;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.Date;
 
 
-@RequiredArgsConstructor
-public class UserAuthProvider {
+@Service
+@AllArgsConstructor
+public class JwtUtils {
 
     @Value("${security.jwt.token.secret-key}")
     private String secretKey;
@@ -34,13 +37,16 @@ public class UserAuthProvider {
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
-    public Authentication validateToken(String token){
+    public String getTokenEmail(String token){
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey)).build();
+        DecodedJWT decoded = verifier.verify(token);
+        return decoded.getIssuer();
+    }
+
+    public Date getTokenDate(String token){
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey)).build();
        DecodedJWT decoded = verifier.verify(token);
-       Date tokenBorn = decoded.getIssuedAt();
-       Date now = new Date();
-       if(now.getTime()- tokenBorn.getTime() > 1_800_000)
-           return
+       return decoded.getIssuedAt();
     }
 }
 

@@ -22,7 +22,6 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JWTAuthFilter jwtAuthFilter;
-    private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -31,8 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sessionMan -> sessionMan.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request.requestMatchers("/messages")
-                        .permitAll().anyRequest().authenticated())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(userAuthenticationEntryPoint));
+                        .permitAll().anyRequest().authenticated());
 
         return http.build();
     }
