@@ -6,9 +6,7 @@ import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
 import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.utils.JwtUtils;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,7 +40,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
     @Override
     public String doLogin(String email, String password) {
-        try{
+
 
         Long id = repository.getCustomerIdFromEmail(email);
 
@@ -57,17 +55,11 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
         else
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"password non valida");
 
-        } catch(DataAccessException ex){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "errore interno del database durante il login");
-        }catch (Exception ex){
-            throw  new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "errore generico interno del sistema durante  il login");
-        }
-
     }
 
     @Override
     public String doRegistration(CustomerDtoComplete customer) {
-        try {
+
             Customer customerDB = new Customer();
 
             customerDB.setEmail(customer.email());
@@ -84,14 +76,6 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             repository.flush();
 
           return  jwtUtils.createToken(customer.email());
-
-
-        }catch(DataAccessException ex){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "erore interno del database durante il login");
-        }catch (Exception ex){
-            throw  new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "errore generico interno del sistema durante  il login");
-        }
-
 
     }
 
