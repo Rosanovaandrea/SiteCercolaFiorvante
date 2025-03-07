@@ -1,0 +1,45 @@
+.calendar-container {
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    padding: 20px;
+    width: 20%;
+    margin: 0 auto;
+  }
+  
+  .react-datepicker {
+    border: 1px solid #ccc; /* Bordo leggero */
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+  }
+  
+  .react-datepicker__header {
+    background-color: #f8f8f8; /* Intestazione bianca */
+    border-bottom: 1px solid #eee;
+    color: #333; /* Testo grigio scuro */
+  }
+  
+  .react-datepicker__day-names {
+    background-color: #f8f8f8; /* Nomi dei giorni bianchi */
+    color: #333;
+  }
+  
+  .react-datepicker__day,
+  .react-datepicker__month-text,
+  .react-datepicker__quarter-text,
+  .react-datepicker__year-text {
+    color: #333; /* Testo grigio scuro */
+  }
+  
+  .react-datepicker__day--selected,
+  .react-datepicker__day--highlighted {
+    background-color: #e0e0e0 !important; /* Data selezionata/evidenziata grigio chiaro */
+    color: #333 !important;
+  }
+  
+  .react-datepicker__day--excluded {
+    background-color: #eee;
+    color: #999;
+    text-decoration: line-through;
+  }

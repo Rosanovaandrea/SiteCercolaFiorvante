@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 public record CustomerDtoList(
         @NotNull String surname,
         @NotNull String name,
-        @Email String email
+        @NotNull @Email String email
 ) {
 
 }

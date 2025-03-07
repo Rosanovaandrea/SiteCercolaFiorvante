@@ -15,10 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +26,13 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
 
     @Override
-    public CustomerDtoSafe doEmailPasswordReset(String email) {
-        return null;
+    public boolean doEmailPasswordReset(String email) {
+        byte[] code = new byte[4];
+        Random codeGenerator = new Random();
+        codeGenerator.nextBytes(code);
+        String tokenString = jwtUtils.createToken(code.toString());
+        repository.setToken(tokenString,email);
+        return true;
     }
 
     @Override

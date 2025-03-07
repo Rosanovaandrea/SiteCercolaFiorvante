@@ -1,0 +1,54 @@
+.vertical-slider {
+    display: flex;
+    width: 100%;
+    height: 500px;
+    background-color: orange;
+    color: black;
+  }
+  
+  .menu {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    background-color: rgba(255, 255, 255, 0.2); /* Leggera trasparenza */
+  }
+  
+  .menu button {
+    padding: 15px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    text-align: left;
+  }
+  
+  .menu button.active {
+    background-color: rgba(255, 255, 255, 0.4); /* Evidenziazione slide attiva */
+  }
+  
+  .content {
+    padding: 20px;
+    width: 80%;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .vertical-slider {
+      flex-direction: column;
+      height: auto;
+    }
+  
+    .menu {
+      flex-direction: row;
+      width: 100%;
+      overflow-x: auto;
+    }
+  
+    .menu button {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+  
+    .content {
+      width: 100%;
+    }
+  }

@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.security.core.Authentication;
 
 public interface CustomerAuthenticationService {
-    CustomerDtoSafe doEmailPasswordReset(String email );
+    boolean doEmailPasswordReset(String email );
 
     CustomerDtoSafe doPasswordReset(String password );
 
