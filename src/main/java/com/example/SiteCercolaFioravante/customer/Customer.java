@@ -3,6 +3,7 @@ import com.example.SiteCercolaFioravante.reservation.Reservation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -36,11 +37,13 @@ public class Customer {
 
     @NotNull
     @Column( nullable = false )
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private CustomerRole role;
 
     private String tokenRegistration;
 
     @NotNull
+    @Size(max = 10, min=10)
     @Column( length = 10, unique = true)
     private String phoneNumber;
 

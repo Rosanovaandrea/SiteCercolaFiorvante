@@ -17,6 +17,6 @@ public interface CustomerService {
 
     long getCustomerIdFromEmail(String email);
 
-    boolean insertCustomer(CustomerDtoSafe customer);
+    boolean insertCustomerFromAdmin(CustomerDtoSafe customer);
 }
 

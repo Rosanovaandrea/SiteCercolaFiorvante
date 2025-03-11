@@ -1,12 +1,12 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
 import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
 
     CustomerRepository repository;
@@ -40,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public boolean insertCustomer(CustomerDtoSafe customer) {
+    public boolean insertCustomerFromAdmin(CustomerDtoSafe customer) {
 
 
         //TO-DO make a function that delete in loco customer added for remote registration
@@ -51,7 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerDB.setEmail((id+1)+"customer@gmail.com");
 
         //random generated password for in loco added Customer
-        byte[] code = new byte[8];
+        byte[] code = new byte[10];
         Random codeGenerator = new Random();
         codeGenerator.nextBytes(code);
         String str = new String(code, StandardCharsets.UTF_8);
@@ -60,7 +60,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerDB.setName(customer.name());
         customerDB.setSurname(customer.surname());
-        customerDB.setRole("Customer from Admin");
+        customerDB.setRole(CustomerRole.CUSTOMER_IN_LOCO);
         customerDB.setPhoneNumber(customer.phoneNumber());
 
         repository.save(customerDB);

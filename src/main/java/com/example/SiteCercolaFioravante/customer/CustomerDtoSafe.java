@@ -8,6 +8,5 @@ public record CustomerDtoSafe(
                               @NotNull String surname,
                               @NotNull String name,
                               @Email String email,
-                              @NotNull  String role,
                               @NotNull @Size(max = 10, min=10) String phoneNumber) {
 }

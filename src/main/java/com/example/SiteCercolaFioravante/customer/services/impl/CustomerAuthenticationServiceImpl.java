@@ -2,6 +2,7 @@ package com.example.SiteCercolaFioravante.customer.services.impl;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
 import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
@@ -67,7 +68,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             customerDB.setEmail(customer.email());
             customerDB.setName(customer.name());
             customerDB.setSurname(customer.surname());
-            customerDB.setRole(customer.role());
+            customerDB.setRole(CustomerRole.CUSTOMER);
             customerDB.setPhoneNumber(customer.phoneNumber());
 
             String password = BCrypt.hashpw(customer.password(), BCrypt.gensalt());
@@ -90,7 +91,6 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
         List<SimpleGrantedAuthority> authorities = new LinkedList<SimpleGrantedAuthority>();
         String role = customer.role();
         authorities.add(new SimpleGrantedAuthority(role));
-        Authentication authentication = new UsernamePasswordAuthenticationToken(customer,token, authorities);
-        return authentication;
+        return new UsernamePasswordAuthenticationToken(customer,token, authorities);
     }
 }
