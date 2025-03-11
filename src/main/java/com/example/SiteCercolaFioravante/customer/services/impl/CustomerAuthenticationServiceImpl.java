@@ -89,7 +89,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
         CustomerDtoSafe customer = repository.getCustomerSafe(email);
         Date now = new Date();
         List<SimpleGrantedAuthority> authorities = new LinkedList<SimpleGrantedAuthority>();
-        String role = customer.role();
+        String role = CustomerRole.CUSTOMER.toString();
         authorities.add(new SimpleGrantedAuthority(role));
         return new UsernamePasswordAuthenticationToken(customer,token, authorities);
     }
