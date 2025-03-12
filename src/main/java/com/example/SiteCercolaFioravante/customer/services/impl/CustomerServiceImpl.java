@@ -1,9 +1,6 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
-import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
-import com.example.SiteCercolaFioravante.customer.CustomerRole;
+import com.example.SiteCercolaFioravante.customer.*;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import lombok.AllArgsConstructor;
@@ -67,5 +64,11 @@ public class CustomerServiceImpl implements CustomerService {
         repository.flush();
 
         return true;
+    }
+
+    @Override
+    public boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer) {
+
+
     }
 }
