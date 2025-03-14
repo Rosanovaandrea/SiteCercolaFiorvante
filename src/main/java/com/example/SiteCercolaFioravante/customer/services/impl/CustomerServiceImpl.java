@@ -1,9 +1,13 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
 import com.example.SiteCercolaFioravante.customer.*;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +16,12 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
 
-    CustomerRepository repository;
+    private final CustomerRepository repository;
+    private final MapperCustomer mapper;
+
     @Override
     public List<CustomerDtoList> getCustomerByNameOrSurname(String nameSurname) {
         return repository.getCustomerByNameOrSurname(nameSurname);
@@ -55,10 +61,7 @@ public class CustomerServiceImpl implements CustomerService {
         str=BCrypt.hashpw(str, BCrypt.gensalt());
         customerDB.setPassword(str);
 
-        customerDB.setName(customer.name());
-        customerDB.setSurname(customer.surname());
-        customerDB.setRole(CustomerRole.CUSTOMER_IN_LOCO);
-        customerDB.setPhoneNumber(customer.phoneNumber());
+        mapper.fromDtoSafeToCustomer(customer,customerDB);
 
         repository.save(customerDB);
         repository.flush();
@@ -68,7 +71,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer) {
-
-
+        Customer customerDB = repository.getCustomerFromEmail(customer.prevEmail());
+        mapper.fromDtoEditAdminToCustomer(customer,customerDB);
+        repository.save(customerDB);
+        repository.flush();
+        return true;
     }
 }

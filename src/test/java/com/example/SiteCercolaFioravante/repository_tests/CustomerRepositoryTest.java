@@ -1,8 +1,8 @@
 package com.example.SiteCercolaFioravante.repository_tests;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

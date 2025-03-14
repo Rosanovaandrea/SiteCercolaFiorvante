@@ -1,8 +1,8 @@
 package com.example.SiteCercolaFioravante.customer.repository;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,5 +35,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     @Query("SELECT MAX(ctm.id) FROM Customer ctm")
     long getCurrentId();
+
+    Customer getCustomerFromEmail(String email);
 
 }

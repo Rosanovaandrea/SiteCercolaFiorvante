@@ -1,11 +1,12 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
     private final JwtUtils jwtUtils;
     private final CustomerRepository repository;
+    private final MapperCustomer mapper;
 
 
     @Override
@@ -31,7 +33,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
         byte[] code = new byte[4];
         Random codeGenerator = new Random();
         codeGenerator.nextBytes(code);
-        String tokenString = jwtUtils.createToken(code.toString());
+        String tokenString = jwtUtils.createToken(Arrays.toString(code));
         repository.setToken(tokenString,email);
         return true;
     }
@@ -64,12 +66,8 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     public String doRegistration(CustomerDtoComplete customer) {
 
             Customer customerDB = new Customer();
-
-            customerDB.setEmail(customer.email());
-            customerDB.setName(customer.name());
-            customerDB.setSurname(customer.surname());
+            mapper.fromDtoCompleteToCustomer(customer,customerDB);
             customerDB.setRole(CustomerRole.CUSTOMER);
-            customerDB.setPhoneNumber(customer.phoneNumber());
 
             String password = BCrypt.hashpw(customer.password(), BCrypt.gensalt());
 

@@ -1,10 +1,8 @@
-package com.example.SiteCercolaFioravante.customer;
+package com.example.SiteCercolaFioravante.customer.data_transfer_objects;
 
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.LinkedList;
 
 public record CustomerDtoComplete(
 
@@ -13,6 +11,5 @@ public record CustomerDtoComplete(
   @NotNull     String name,
   @NotNull     String password,
   @NotNull @Email String email,
-  @NotNull     String role,
   @NotNull     String phoneNumber) {
 }

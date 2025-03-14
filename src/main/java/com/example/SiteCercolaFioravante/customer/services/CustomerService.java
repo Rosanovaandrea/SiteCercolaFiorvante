@@ -1,9 +1,8 @@
 package com.example.SiteCercolaFioravante.customer.services;
 
-import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoEditAdmin;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoList;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 
 import java.util.List;
 

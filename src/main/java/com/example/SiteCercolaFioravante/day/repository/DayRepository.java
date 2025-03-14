@@ -1,7 +1,8 @@
 package com.example.SiteCercolaFioravante.day.repository;
 
+import com.example.SiteCercolaFioravante.day.Data_transfer_object.CalendarDayDtoList;
+import com.example.SiteCercolaFioravante.day.Data_transfer_object.CalendarDtoSingleComplete;
 import com.example.SiteCercolaFioravante.day.Day;
-import com.example.SiteCercolaFioravante.day.repository.CalendarDayProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +14,11 @@ import java.util.List;
 @Repository
 public interface DayRepository extends JpaRepository<Day, Long> {
 
-    @Query("select d.date as date, d.occupiedHour as occupiedHour from Day d WHERE d.date BETWEEN :start AND :end")
-    List<CalendarDayProjection> getDaysByTime(@Param("start") Date start,@Param("end") Date end);
+    @Query("select d.date as date, d.isAvailable as isAvailable from Day d WHERE d.date BETWEEN :start AND :end")
+    List<CalendarDayDtoList> getDaysByTime(@Param("start") Date start, @Param("end") Date end);
+
+    @Query("select d.date as date, d.occupiedHour as occupiedHour as isAvailable from Day d WHERE d.date = date")
+    CalendarDtoSingleComplete getSingleDay(@Param("date")Date date);
+
 
 }

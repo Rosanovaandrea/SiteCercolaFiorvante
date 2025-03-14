@@ -1,8 +1,7 @@
 package com.example.SiteCercolaFioravante.customer.services;
 
-import com.example.SiteCercolaFioravante.customer.CustomerDtoComplete;
-import com.example.SiteCercolaFioravante.customer.CustomerDtoSafe;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import org.springframework.security.core.Authentication;
 
 public interface CustomerAuthenticationService {
