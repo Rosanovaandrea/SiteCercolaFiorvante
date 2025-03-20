@@ -20,5 +20,4 @@ public interface DayRepository extends JpaRepository<Day, Long> {
     @Query("select d.date as date, d.occupiedHour as occupiedHour as isAvailable from Day d WHERE d.date = date")
     CalendarDtoSingleComplete getSingleDay(@Param("date")Date date);
 
-
 }

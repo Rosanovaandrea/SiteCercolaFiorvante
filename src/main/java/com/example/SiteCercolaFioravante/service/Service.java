@@ -37,11 +37,5 @@ public class Service {
     @OneToMany( mappedBy = "service" )
     private LinkedList<Reservation> reservations;
 
-    @Max(10)
-    @Min(0)
-    private int preference;
-
-    private int position;
-
 
 }
