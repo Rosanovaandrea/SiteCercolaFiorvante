@@ -1,4 +1,4 @@
-package com.example.SiteCercolaFioravante.day.Data_transfer_object;
+package com.example.SiteCercolaFioravante.day.data_transfer_object;
 
 import com.example.SiteCercolaFioravante.day.Day;
 import org.mapstruct.Mapper;

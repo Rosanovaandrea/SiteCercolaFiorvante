@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 @Data
@@ -21,11 +22,12 @@ public class Service {
     private long id;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(unique = true)
     private String serviceName;
 
+    @ElementCollection
     @Array( length = 4 )
-    private String[] images;
+    private ArrayList< String > images;
 
     @ColumnDefault("20.0f")
     private float price;

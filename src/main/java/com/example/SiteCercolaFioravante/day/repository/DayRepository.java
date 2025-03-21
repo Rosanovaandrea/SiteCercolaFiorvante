@@ -1,7 +1,7 @@
 package com.example.SiteCercolaFioravante.day.repository;
 
-import com.example.SiteCercolaFioravante.day.Data_transfer_object.CalendarDayDtoList;
-import com.example.SiteCercolaFioravante.day.Data_transfer_object.CalendarDtoSingleComplete;
+import com.example.SiteCercolaFioravante.day.data_transfer_object.CalendarDayDtoList;
+import com.example.SiteCercolaFioravante.day.data_transfer_object.CalendarDtoSingleComplete;
 import com.example.SiteCercolaFioravante.day.Day;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
