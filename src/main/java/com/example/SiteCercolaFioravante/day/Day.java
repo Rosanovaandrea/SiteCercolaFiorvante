@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -22,7 +23,7 @@ public class Day {
     private boolean isAvailable;
 
     @Array( length = 8 )
-    boolean[] occupiedHour;
+    ArrayList<Integer> occupiedHour;
 
     @OneToMany( mappedBy = "day", cascade = CascadeType.ALL )
     private LinkedList<Reservation> reservations;

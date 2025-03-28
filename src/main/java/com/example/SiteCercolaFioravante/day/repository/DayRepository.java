@@ -14,10 +14,12 @@ import java.util.List;
 @Repository
 public interface DayRepository extends JpaRepository<Day, Long> {
 
-    @Query("select d.date as date, d.isAvailable as isAvailable from Day d WHERE d.date BETWEEN :start AND :end")
+    @Query("select new com.example.SiteCercolaFioravante.day.data_transfer_object.CalendarDayDtoList(d.date, d.isAvailable)" +
+            " from Day d WHERE d.date BETWEEN :start AND :end")
     List<CalendarDayDtoList> getDaysByTime(@Param("start") Date start, @Param("end") Date end);
 
-    @Query("select d.date as date, d.occupiedHour as occupiedHour as isAvailable from Day d WHERE d.date = date")
+    @Query("select new com.example.SiteCercolaFioravante.day.data_transfer_object.CalendarDtoSingleComplete(d.date,d.isAvailable, d.occupiedHour)" +
+            " from Day d WHERE d.date = date")
     CalendarDtoSingleComplete getSingleDay(@Param("date")Date date);
 
 }

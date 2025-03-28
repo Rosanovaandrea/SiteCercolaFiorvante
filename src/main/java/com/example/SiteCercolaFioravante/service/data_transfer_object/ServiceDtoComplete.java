@@ -2,12 +2,10 @@ package com.example.SiteCercolaFioravante.service.data_transfer_object;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public record ServiceDtoComplete(
-                                    String prevServiceName,
-                                    @NotNull String serviceName,
-                                    ArrayList< String > images,
-                                    @NotNull float price,
-                                    @NotNull String description
-                                    ) {}
+        @NotNull String serviceName,
+        @NotNull HashSet<String> images,
+        @NotNull double price,
+        @NotNull String description) {}

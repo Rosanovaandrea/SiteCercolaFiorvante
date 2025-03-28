@@ -5,12 +5,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.ColumnDefault;
-
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
+
 
 @Data
 @NoArgsConstructor
@@ -26,11 +27,13 @@ public class Service {
     private String serviceName;
 
     @ElementCollection
-    @Array( length = 4 )
-    private ArrayList< String > images;
+    @Size( max = 4 )
+    private HashSet< String > images;
 
-    @ColumnDefault("20.0f")
-    private float price;
+    private String firstImage;
+
+    @Column(nullable = false)
+    private double price;
 
     @NotNull
     @Column( nullable = false, length = 1500 )

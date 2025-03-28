@@ -7,5 +7,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel ="spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MapperService {
-    void ServiceDtoCompleteToService(ServiceDtoComplete service,@MappingTarget Service serviceDB);
+    void ServiceDtoCompleteUploadToService(ServiceDtoCompleteUpload service, @MappingTarget Service serviceDB);
+    void ServiceToServiceDtoComplete(  Service serviceDB, @MappingTarget  ServiceDtoComplete service);
 }

@@ -18,8 +18,9 @@ public interface ServiceRepository  extends JpaRepository<Service, Long > {
     @Query( "SELECT serv.serviceName as serviceName FROM Service serv " )
     List<String> getServiceListByNames();
 
-    @Query("SELECT serv.serviceName as serviceName, serv.images as images, serv.price as price, serv.description as description FROM Service serv WHERE serv.serviceName = :serviceName")
-    ServiceDtoComplete getServiceDtoCompleteByName( @Param( "serviceName" ) String serviceName);
+    @Query("SELECT serv FROM Service serv WHERE serv.serviceName = :serviceName")
+    Service getServiceDtoCompleteByName( @Param( "serviceName" ) String serviceName);
 
-    Service getServiceDbByName( String serviceName );
+    @Query("SELECT serv FROM Service serv WHERE serv.serviceName = :serviceName")
+    Service getServiceDbByName(@Param( "serviceName" ) String serviceName );
 }
