@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -83,9 +84,9 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     @Override
     public Authentication doAuthentication(String token) {
         String email = jwtUtils.getTokenEmail(token);
-        Date expiration = jwtUtils.getTokenDate(token);
+        LocalDateTime expiration = jwtUtils.getTokenLocalDate(token);
         Customer customer = repository.getCustomerFromEmail( email);
-        Date now = new Date();
+        LocalDateTime now =  LocalDateTime.now();
         List<SimpleGrantedAuthority> authorities = new LinkedList<SimpleGrantedAuthority>();
         String role = CustomerRole.CUSTOMER.toString();
         authorities.add(new SimpleGrantedAuthority(role));

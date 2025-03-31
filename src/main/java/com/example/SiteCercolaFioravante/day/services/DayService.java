@@ -5,12 +5,13 @@ import com.example.SiteCercolaFioravante.day.data_transfer_object.CalendarDtoSin
 import com.example.SiteCercolaFioravante.day.Day;
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedList;
 
 public interface DayService {
-        Day insertDayFromReservation(CalendarDtoSingleComplete Day, Reservation reservation);
+        Day insertDayFromReservation(LocalDate date, Reservation reservation);
         boolean insertDay(CalendarDtoSingleComplete Day);
-        LinkedList<CalendarDayDtoList> getDaysFromMonth(Date start);
+        LinkedList<CalendarDayDtoList> getDaysFromMonth(LocalDate start);
         boolean ModifyDay(CalendarDtoSingleComplete day);
+        void deleteReservationFromDay(LocalDate date,int hour);
 }

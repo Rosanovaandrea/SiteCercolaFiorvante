@@ -5,6 +5,7 @@ import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,11 @@ public class CustomerRepositoryTest {
 
     private Customer testCustomer;
 
-    @Autowired
-    CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
+
+    public CustomerRepositoryTest(@Autowired CustomerRepository repository){
+        customerRepository = repository;
+    }
 
     @BeforeEach
     public void init() {

@@ -1,5 +1,6 @@
 package com.example.SiteCercolaFioravante.customer.services;
 
+import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
@@ -20,5 +21,7 @@ public interface CustomerService {
     boolean insertCustomerFromAdmin(CustomerDtoSafe customer);
 
     boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer);
+
+    Customer getCustomerFromEmail(String email);
 }
 

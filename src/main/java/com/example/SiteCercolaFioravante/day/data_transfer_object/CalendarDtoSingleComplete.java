@@ -2,13 +2,13 @@ package com.example.SiteCercolaFioravante.day.data_transfer_object;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.HashSet;
 
 public record CalendarDtoSingleComplete(
-       @NotNull Date date,
+       @NotNull LocalDate date,
        @NotNull boolean isAvailable,
-       @NotNull ArrayList<Integer> occupiedHour
+       @NotNull HashSet<Integer> occupiedHour
 
 ) {
 }

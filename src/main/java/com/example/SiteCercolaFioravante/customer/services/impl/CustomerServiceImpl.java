@@ -77,4 +77,9 @@ public class CustomerServiceImpl implements CustomerService {
         repository.flush();
         return true;
     }
+
+    @Override
+    public Customer getCustomerFromEmail(String email) {
+      return  repository.getCustomerFromEmail(email);
+    }
 }

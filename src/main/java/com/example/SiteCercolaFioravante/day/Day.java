@@ -2,13 +2,13 @@ package com.example.SiteCercolaFioravante.day;
 
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.Array;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedList;
+import java.util.Set;
 
 
 @Entity
@@ -17,13 +17,14 @@ import java.util.LinkedList;
 public class Day {
 
     @Id
-    private Date date;
+    private LocalDate date;
 
     @ColumnDefault( "true" )
     private boolean isAvailable;
 
-    @Array( length = 8 )
-    ArrayList<Integer> occupiedHour;
+    @Size( max = 8 )
+    @ElementCollection
+    Set<Integer> occupiedHour;
 
     @OneToMany( mappedBy = "day", cascade = CascadeType.ALL )
     private LinkedList<Reservation> reservations;

@@ -7,13 +7,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
-import java.util.Date;
 
 
 @Service
@@ -29,11 +29,11 @@ public class JwtUtils {
     }
 
     public String createToken(String login) {
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + 1_800_000);
+        LocalDateTime now =  LocalDateTime.now();
+        LocalDateTime validity = now.plusMinutes(30);
         return JWT.create().withIssuer(login)
-                .withIssuedAt(now)
-                .withExpiresAt(validity)
+                .withIssuedAt(Instant.from(now))
+                .withExpiresAt(Instant.from(validity))
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
@@ -43,10 +43,11 @@ public class JwtUtils {
         return decoded.getIssuer();
     }
 
-    public Date getTokenDate(String token){
+    public LocalDateTime getTokenLocalDate(String token){
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey)).build();
        DecodedJWT decoded = verifier.verify(token);
-       return decoded.getIssuedAt();
+        ZoneId systemZone = ZoneId.systemDefault();
+       return decoded.getIssuedAt().toInstant().atZone(systemZone).toLocalDateTime();
     }
 }
 
