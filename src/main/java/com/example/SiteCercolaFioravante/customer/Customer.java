@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.LinkedList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -48,7 +49,7 @@ public class Customer {
     private String phoneNumber;
 
     @OneToMany( mappedBy = "customer", cascade = CascadeType.ALL )
-    private LinkedList<Reservation> reservations;
+    private List<Reservation> reservations;
 
 
 }

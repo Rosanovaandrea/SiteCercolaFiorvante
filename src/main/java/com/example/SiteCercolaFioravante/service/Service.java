@@ -11,6 +11,8 @@ import org.hibernate.annotations.Array;
 import org.hibernate.annotations.ColumnDefault;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 
 @Data
@@ -40,7 +42,7 @@ public class Service {
     private String description;
 
     @OneToMany( mappedBy = "service" )
-    private LinkedList<Reservation> reservations;
+    private List<Reservation> reservations;
 
 
 }

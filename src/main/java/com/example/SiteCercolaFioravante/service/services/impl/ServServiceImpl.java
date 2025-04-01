@@ -116,7 +116,7 @@ public class ServServiceImpl implements ServService {
     public boolean updateService(ServiceDtoCompleteUpload service) {
         Service serviceDB = repository.getServiceDbByName(service.prevServiceName());
         mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
-        HashSet<String> images = serviceDB.getImages();
+        HashSet<String> images =(HashSet) serviceDB.getImages();
 
         try {
             transferToFile(service.imagesDataInsert(),"");

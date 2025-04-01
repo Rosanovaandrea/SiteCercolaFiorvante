@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 
@@ -27,7 +28,7 @@ public class Day {
     Set<Integer> occupiedHour;
 
     @OneToMany( mappedBy = "day", cascade = CascadeType.ALL )
-    private LinkedList<Reservation> reservations;
+    private List<Reservation> reservations;
 
 
 }
