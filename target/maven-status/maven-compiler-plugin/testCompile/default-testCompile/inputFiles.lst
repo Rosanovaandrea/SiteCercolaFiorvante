@@ -1,0 +1,6 @@
+/home/andrea/IdeaProjects/SiteCercolaFiorvante/src/test/java/com/example/SiteCercolaFioravante/SiteCercolaFioravanteApplicationTests.java
+/home/andrea/IdeaProjects/SiteCercolaFiorvante/src/test/java/com/example/SiteCercolaFioravante/integration_service_tests/CustomerServiceTest.java
+/home/andrea/IdeaProjects/SiteCercolaFiorvante/src/test/java/com/example/SiteCercolaFioravante/repository_tests/CustomerRepositoryTest.java
+/home/andrea/IdeaProjects/SiteCercolaFiorvante/src/test/java/com/example/SiteCercolaFioravante/repository_tests/DayRepositoryTest.java
+/home/andrea/IdeaProjects/SiteCercolaFiorvante/src/test/java/com/example/SiteCercolaFioravante/repository_tests/ReservationRepositoryTest.java
+/home/andrea/IdeaProjects/SiteCercolaFiorvante/src/test/java/com/example/SiteCercolaFioravante/repository_tests/ServiceRepositoryTest.java

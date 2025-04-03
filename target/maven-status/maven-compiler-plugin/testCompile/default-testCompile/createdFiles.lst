@@ -1,0 +1,6 @@
+com/example/SiteCercolaFioravante/repository_tests/CustomerRepositoryTest.class
+com/example/SiteCercolaFioravante/repository_tests/ReservationRepositoryTest.class
+com/example/SiteCercolaFioravante/repository_tests/ServiceRepositoryTest.class
+com/example/SiteCercolaFioravante/SiteCercolaFioravanteApplicationTests.class
+com/example/SiteCercolaFioravante/integration_service_tests/CustomerServiceTest.class
+com/example/SiteCercolaFioravante/repository_tests/DayRepositoryTest.class
