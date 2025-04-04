@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -48,9 +49,14 @@ public class CustomerServiceImpl implements CustomerService {
 
         //TO-DO make a function that delete in loco customer added for remote registration
 
-        //random generated password for in loco added Customer
-        long id = repository.getCurrentId();
+
         Customer customerDB = new Customer();
+        customerDB = mapper.fromDtoSafeToCustomer(customer);
+
+        long id = 0;
+        Optional<Long> opt = repository.getCurrentId();
+
+        if(opt.isPresent()) id = opt.get();
         customerDB.setEmail((id+1)+"customer@gmail.com");
 
         //random generated password for in loco added Customer
@@ -61,7 +67,8 @@ public class CustomerServiceImpl implements CustomerService {
         str=BCrypt.hashpw(str, BCrypt.gensalt());
         customerDB.setPassword(str);
 
-        mapper.fromDtoSafeToCustomer(customer,customerDB);
+
+        customerDB.setRole(CustomerRole.CUSTOMER_IN_LOCO);
 
         repository.save(customerDB);
         repository.flush();

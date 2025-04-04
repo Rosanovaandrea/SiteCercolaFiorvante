@@ -7,9 +7,9 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,componentModel = "spring")
 public interface MapperCustomer {
-    void fromDtoEditAdminToCustomer(CustomerDtoEditAdmin customerDtoEditAdmin, @MappingTarget Customer customer);
-    void fromDtoCompleteToCustomer(CustomerDtoComplete customerDtoComplete, @MappingTarget Customer customer);
-    void fromDtoSafeToCustomer(CustomerDtoSafe customerDtoSafe, @MappingTarget Customer customer);
+    void fromDtoEditAdminToCustomer(CustomerDtoEditAdmin customerDtoEditAdmin,@MappingTarget Customer customer);
+    Customer fromDtoCompleteToCustomer(CustomerDtoComplete customerDtoComplete);
+    Customer fromDtoSafeToCustomer(CustomerDtoSafe customerDtoSafe);
 
 
 }

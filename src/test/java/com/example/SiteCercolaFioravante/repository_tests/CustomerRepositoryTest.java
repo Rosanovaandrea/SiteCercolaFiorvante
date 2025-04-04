@@ -7,6 +7,7 @@ import com.example.SiteCercolaFioravante.customer.data_transfer_objects.Customer
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,12 @@ public class CustomerRepositoryTest {
         CustomerDtoSafe savedUser = customerRepository.getCustomerByPhoneNumber(testCustomer.getPhoneNumber());
         assertEquals(testCustomer.getEmail(), savedUser.email());
         assertEquals(testCustomer.getName(), savedUser.name());
+    }
+
+    @Test
+    void getCustomerFromEmailTest(){
+        Customer customer = customerRepository.getCustomerFromEmail(testCustomer.getEmail());
+        Assertions.assertEquals(customer.getEmail(),testCustomer.getEmail());
     }
 
     @AfterEach

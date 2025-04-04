@@ -5,8 +5,6 @@ package com.example.SiteCercolaFioravante.utils;
 import com.auth0.jwt.*;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,17 +13,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
 
-
 @Service
-@AllArgsConstructor
 public class JwtUtils {
 
-    @Value("${security.jwt.token.secret-key}")
-    private String secretKey;
+    private final String secretKey;
 
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+    public JwtUtils(
+                    @Value("${security.jwt.token.secret-key}") String secretKey
+                    ){
+        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     public String createToken(String login) {

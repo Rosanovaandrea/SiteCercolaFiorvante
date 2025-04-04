@@ -67,7 +67,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     public String doRegistration(CustomerDtoComplete customer) {
 
             Customer customerDB = new Customer();
-            mapper.fromDtoCompleteToCustomer(customer,customerDB);
+            mapper.fromDtoCompleteToCustomer(customer);
             customerDB.setRole(CustomerRole.CUSTOMER);
 
             String password = BCrypt.hashpw(customer.password(), BCrypt.gensalt());

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
@@ -39,7 +40,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     void setToken(@Param("token")String token, @Param("email") String email);
 
     @Query("SELECT MAX(ctm.id) FROM Customer ctm")
-    long getCurrentId();
+    Optional<Long> getCurrentId();
+
     @Query("SELECT ctm FROM Customer ctm WHERE ctm.email = :email")
     Customer getCustomerFromEmail(String email);
 
