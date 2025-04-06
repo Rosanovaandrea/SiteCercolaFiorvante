@@ -22,6 +22,8 @@ public interface CustomerService {
 
     boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer);
 
-    Customer getCustomerFromEmail(String email);
+    Customer getCustomerFromEmailReservation(String email);
+
+    CustomerDtoSafe getCustomerFromEmail(String email);
 }
 

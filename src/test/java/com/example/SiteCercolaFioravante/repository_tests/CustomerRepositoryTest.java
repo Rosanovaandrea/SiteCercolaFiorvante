@@ -5,7 +5,6 @@ import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,7 @@ public class CustomerRepositoryTest {
     public void init() {
         // Initialize test data before each test method
         testCustomer = new Customer();
-        testCustomer.setEmail("ardemus@gnail.com");
+        testCustomer.setEmail("ardemus@gmail.com");
         testCustomer.setName("andres");
         testCustomer.setSurname("rosanova");
         testCustomer.setPassword("cheeks");
@@ -68,8 +67,8 @@ public class CustomerRepositoryTest {
     }
 
     @Test
-    void getCustomerFromEmailTest(){
-        Customer customer = customerRepository.getCustomerFromEmail(testCustomer.getEmail());
+    void findCustomerByEmailTest(){
+        Customer customer = customerRepository.findCustomerByEmail(testCustomer.getEmail()).orElse(null);
         Assertions.assertEquals(customer.getEmail(),testCustomer.getEmail());
     }
 

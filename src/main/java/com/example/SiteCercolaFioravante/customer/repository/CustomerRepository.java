@@ -42,7 +42,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("SELECT MAX(ctm.id) FROM Customer ctm")
     Optional<Long> getCurrentId();
 
-    @Query("SELECT ctm FROM Customer ctm WHERE ctm.email = :email")
-    Customer getCustomerFromEmail(String email);
+    Optional<Customer> findCustomerByEmail(String email);
+
+    @Query("SELECT new com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe" +
+            "(ctm.surname, ctm.name, ctm.email, ctm.phoneNumber) From Customer ctm WHERE ctm.email = :email " )
+    Optional<CustomerDtoSafe> findCustomerDtoSafeByEmail(@Param("email") String email);
 
 }

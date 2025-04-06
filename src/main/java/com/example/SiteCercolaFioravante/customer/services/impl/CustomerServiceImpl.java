@@ -78,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer) {
-        Customer customerDB = repository.getCustomerFromEmail(customer.prevEmail());
+        Customer customerDB = repository.findCustomerByEmail(customer.prevEmail()).orElse(null);
         mapper.fromDtoEditAdminToCustomer(customer,customerDB);
         repository.save(customerDB);
         repository.flush();
@@ -86,7 +86,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer getCustomerFromEmail(String email) {
-      return  repository.getCustomerFromEmail(email);
+    public Customer getCustomerFromEmailReservation(String email) {
+      return  repository.findCustomerByEmail(email).orElse(null);
+    }
+
+    @Override
+    public CustomerDtoSafe getCustomerFromEmail(String email) {
+        return repository.findCustomerDtoSafeByEmail(email).orElse(null);
     }
 }

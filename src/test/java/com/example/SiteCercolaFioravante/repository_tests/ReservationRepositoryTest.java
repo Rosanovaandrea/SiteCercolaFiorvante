@@ -88,7 +88,7 @@ public class ReservationRepositoryTest {
 
         day=dayRepository.getSingleDayDB(day.getDate());
         service= serviceRepository.getServiceDbByName(service.getServiceName());
-        testCustomer=customerRepository.getCustomerFromEmail(testCustomer.getEmail());
+        testCustomer=customerRepository.findCustomerByEmail(testCustomer.getEmail()).orElse(null);
 
 
         List<Reservation> reservations = new LinkedList<Reservation>();

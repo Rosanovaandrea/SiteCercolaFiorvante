@@ -85,7 +85,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     public Authentication doAuthentication(String token) {
         String email = jwtUtils.getTokenEmail(token);
         LocalDateTime expiration = jwtUtils.getTokenLocalDate(token);
-        Customer customer = repository.getCustomerFromEmail( email);
+        Customer customer = repository.findCustomerByEmail( email).orElse(null);
         LocalDateTime now =  LocalDateTime.now();
         List<SimpleGrantedAuthority> authorities = new LinkedList<SimpleGrantedAuthority>();
         String role = CustomerRole.CUSTOMER.toString();

@@ -29,7 +29,7 @@ public class ReservationServiceImpl implements ReservationService {
     public boolean insertReservation(ReservationDtoInsert reservation) {
         Reservation reservationDB = new Reservation();
         reservationDB.setService(servService.insertServiceForReservation(reservation.serviceName(),reservationDB));
-        reservationDB.setCustomer(customerService.getCustomerFromEmail(reservation.email()));
+        reservationDB.setCustomer(customerService.getCustomerFromEmailReservation(reservation.email()));
         reservationDB.setCompleted(false);
         reservationDB.setDeletable(false);
         reservationDB.setHour(reservation.hour());
