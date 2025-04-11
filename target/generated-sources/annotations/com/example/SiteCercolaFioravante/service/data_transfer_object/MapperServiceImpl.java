@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T19:37:05+0200",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.6 (JetBrains s.r.o.)"
+    date = "2025-04-10T20:44:26+0200",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.14 (JetBrains s.r.o.)"
 )
 @Component
 public class MapperServiceImpl implements MapperService {
@@ -16,6 +16,14 @@ public class MapperServiceImpl implements MapperService {
     public void ServiceDtoCompleteUploadToService(ServiceDtoCompleteUpload service, Service serviceDB) {
         if ( service == null ) {
             return;
+        }
+
+        if ( service.serviceName() != null ) {
+            serviceDB.setServiceName( service.serviceName() );
+        }
+        serviceDB.setPrice( service.price() );
+        if ( service.description() != null ) {
+            serviceDB.setDescription( service.description() );
         }
     }
 

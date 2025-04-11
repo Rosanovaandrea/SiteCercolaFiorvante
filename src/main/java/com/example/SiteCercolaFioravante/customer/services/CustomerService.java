@@ -4,6 +4,7 @@ import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.reservation.Reservation;
 
 import java.util.List;
 
@@ -25,5 +26,7 @@ public interface CustomerService {
     Customer getCustomerFromEmailReservation(String email);
 
     CustomerDtoSafe getCustomerFromEmail(String email);
+
+    void inserReservationCustomer(Reservation reservation);
 }
 

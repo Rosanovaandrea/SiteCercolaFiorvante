@@ -28,9 +28,9 @@ public class Service {
     @Column(unique = true)
     private String serviceName;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Size( max = 4 )
-    private HashSet< String > images;
+    private Set<String> images;
 
     private String firstImage;
 

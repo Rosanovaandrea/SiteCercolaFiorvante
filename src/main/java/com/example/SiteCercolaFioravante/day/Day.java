@@ -20,7 +20,7 @@ public class Day {
     @Id
     private LocalDate date;
 
-    @ColumnDefault( "true" )
+    @ColumnDefault( "false" )
     private boolean isAvailable;
 
     @Size( max = 8 )

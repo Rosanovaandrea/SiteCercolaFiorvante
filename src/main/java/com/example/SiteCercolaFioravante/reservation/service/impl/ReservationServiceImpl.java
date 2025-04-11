@@ -28,14 +28,18 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public boolean insertReservation(ReservationDtoInsert reservation) {
         Reservation reservationDB = new Reservation();
-        reservationDB.setService(servService.insertServiceForReservation(reservation.serviceName(),reservationDB));
+        reservationDB.setService(servService.getServiceForReservation(reservation.serviceName()));
         reservationDB.setCustomer(customerService.getCustomerFromEmailReservation(reservation.email()));
         reservationDB.setCompleted(false);
         reservationDB.setDeletable(false);
         reservationDB.setHour(reservation.hour());
-        reservationDB.setDay(dayService.insertDayFromReservation(reservation.date(),reservationDB));
+        reservationDB.setDay(dayService.insertReservationfromReservation(reservation.date()));
 
         repository.saveAndFlush(reservationDB);
+
+        servService.insertReservationInService(reservationDB);
+        customerService.inserReservationCustomer(reservationDB);
+        dayService.insertReservationInDay(reservationDB);
 
         return true;
 
@@ -59,7 +63,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     @Override
     public boolean removeReservation(long id) {
-        Reservation reservation = repository.findById(id).get();
+        Reservation reservation = repository.findById(id).orElse(null);
+        if(reservation == null) throw new IllegalArgumentException();
         dayService.deleteReservationFromDay(reservation.getDay().getDate(),reservation.getHour());
         repository.delete(reservation);
         repository.flush();

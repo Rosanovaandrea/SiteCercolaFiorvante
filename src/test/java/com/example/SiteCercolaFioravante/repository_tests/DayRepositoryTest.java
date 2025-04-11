@@ -44,6 +44,7 @@ public class DayRepositoryTest {
     @Test
     void getSingleDayDBTest(){
         Assertions.assertEquals(day,dayRepository.getSingleDayDB(LocalDate.now()));
+
     }
 
 

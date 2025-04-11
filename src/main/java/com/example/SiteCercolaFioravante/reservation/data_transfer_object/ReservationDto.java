@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 
 public record ReservationDto(
+        @NotNull long id,
         @NotNull LocalDate date,
         @NotNull String serviceName,
         @NotNull String name,

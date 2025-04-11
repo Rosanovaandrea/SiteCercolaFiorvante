@@ -1,42 +1,50 @@
 package com.example.SiteCercolaFioravante.integration_service_tests;
 
 import com.example.SiteCercolaFioravante.day.data_transfer_object.CalendarDayDtoList;
-import com.example.SiteCercolaFioravante.day.data_transfer_object.CalendarDtoSingleComplete;
-import com.example.SiteCercolaFioravante.day.data_transfer_object.MapperDay;
 import com.example.SiteCercolaFioravante.day.repository.DayRepository;
 import com.example.SiteCercolaFioravante.day.services.DayService;
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.text.DateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 
-@RequiredArgsConstructor
+@SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DayServiceTest {
     private final DayService dayService;
     private final DayRepository dayRepository;
-    private final MapperDay mapperDay;
+
+    public DayServiceTest(
+            @Autowired DayService dayService,
+            @Autowired DayRepository dayRepository){
+        this.dayService = dayService;
+        this.dayRepository = dayRepository;
+    }
 
     @Test
     @Order(1)
     void insertDayTest(){
 
-        HashSet<Integer> occupiedHour = new HashSet<Integer>();
-        occupiedHour.add(1);
-        occupiedHour.add(2);
-        CalendarDtoSingleComplete day = new CalendarDtoSingleComplete(LocalDate.now(),true,occupiedHour);
-        dayService.insertDay(day);
+        dayService.insertDayFalse(LocalDate.now());
 
         CalendarDayDtoList day1 = dayService.getDaysFromMonth(LocalDate.now()).get(0);
 
         Assertions.assertNotNull(day1);
-        Assertions.assertEquals(day.date(),day1.date());
+        Assertions.assertEquals(LocalDate.now(),day1.date());
+
 
     }
+
+    @Test
+    @Order(2)
+    void getDayFromMonthTest(){
+        CalendarDayDtoList day = dayService.getDaysFromMonth(LocalDate.now()).get(0);
+        Assertions.assertEquals(LocalDate.now(),day.date());
+
+    }
+
+
 
 
 }

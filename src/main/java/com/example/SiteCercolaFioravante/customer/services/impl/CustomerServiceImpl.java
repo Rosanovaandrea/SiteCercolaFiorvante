@@ -7,11 +7,14 @@ import com.example.SiteCercolaFioravante.customer.data_transfer_objects.Customer
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
+import com.example.SiteCercolaFioravante.reservation.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -43,6 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
         return repository.getCustomerIdFromEmail(email);
     }
 
+    @Transactional
     @Override
     public boolean insertCustomerFromAdmin(CustomerDtoSafe customer) {
 
@@ -76,6 +80,7 @@ public class CustomerServiceImpl implements CustomerService {
         return true;
     }
 
+    @Transactional
     @Override
     public boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer) {
         Customer customerDB = repository.findCustomerByEmail(customer.prevEmail()).orElse(null);
@@ -85,6 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
         return true;
     }
 
+
     @Override
     public Customer getCustomerFromEmailReservation(String email) {
       return  repository.findCustomerByEmail(email).orElse(null);
@@ -93,5 +99,18 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDtoSafe getCustomerFromEmail(String email) {
         return repository.findCustomerDtoSafeByEmail(email).orElse(null);
+    }
+
+    @Override
+    public void inserReservationCustomer(Reservation reservation) {
+
+        Customer customerDb = reservation.getCustomer();
+
+        if(customerDb.getReservations() == null)
+            customerDb.setReservations(new LinkedList<Reservation>());
+
+        customerDb.getReservations().add(reservation);
+        repository.saveAndFlush(customerDb);
+
     }
 }

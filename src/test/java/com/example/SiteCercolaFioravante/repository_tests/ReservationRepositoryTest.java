@@ -117,6 +117,7 @@ public class ReservationRepositoryTest {
     void findReservationsByUserNameAndSurnameTest(){
       ReservationDto reservationDto = reservationRepository.findReservationsByUserNameAndSurname(testCustomer.getSurname()).get(0);
       Assertions.assertEquals(reservationDto.surname(),testCustomer.getSurname());
+      Assertions.assertNotNull(dayRepository.getSingleDayDB(LocalDate.now()).getReservations());
     }
 
     @Test

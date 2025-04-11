@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.Arrays;
 
-@Configuration
+
 @EnableWebMvc
 @AllArgsConstructor
 public class SecurityConfig {

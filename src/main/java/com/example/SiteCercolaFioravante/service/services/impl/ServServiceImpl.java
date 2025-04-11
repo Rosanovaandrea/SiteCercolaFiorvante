@@ -7,41 +7,61 @@ import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDto
 import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDtoCompleteUpload;
 import com.example.SiteCercolaFioravante.service.repository.ServiceRepository;
 import com.example.SiteCercolaFioravante.service.services.ServService;
-import lombok.RequiredArgsConstructor;
 import com.example.SiteCercolaFioravante.service.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 @org.springframework.stereotype.Service
-@RequiredArgsConstructor
 public class ServServiceImpl implements ServService {
 
+
+    private final String pathImage;
     private final ServiceRepository repository;
     private final MapperService mapper;
 
-    @Override
-    public Service insertServiceForReservation(String serviceName, Reservation reservation) {
-        Service serviceDB = repository.getServiceDbByName(serviceName);
-
-        if ( serviceDB.getReservations() != null ) {
-                     serviceDB.getReservations().add(reservation);
-            } else {
-                     LinkedList<Reservation> reservations = new LinkedList<Reservation>();
-                     reservations.add(reservation);
-                     serviceDB.setReservations(reservations);
+    public ServServiceImpl(
+                           @Value("${images.path}") String pathImage,
+                           @Autowired ServiceRepository repository,
+                           @Autowired MapperService mapper
+                    ) {
+                        this.pathImage = pathImage;
+                        this.repository = repository;
+                        this.mapper = mapper;
                 }
 
-        repository.save(serviceDB);
-        repository.flush();
 
-        return serviceDB;
+    @Override
+    public void insertReservationInService(Reservation reservation) {
+        Service serviceDB = reservation.getService();
+
+        if(serviceDB.getReservations() == null)
+            serviceDB.setReservations(new LinkedList<Reservation>());
+
+        serviceDB.getReservations().add(reservation);
+
+        repository.saveAndFlush(serviceDB);
+
     }
 
+    @Override
+    public Service getServiceForReservation(String serviceName) {
+        return repository.getServiceDbByName(serviceName);
+    }
+
+    @Transactional
     @Override
     public boolean insertService(ServiceDtoCompleteUpload service) {
 
@@ -49,41 +69,44 @@ public class ServServiceImpl implements ServService {
 
         mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
 
-        HashSet<String> images = serviceDB.getImages();
+        HashSet<String> images = new HashSet<String>();
+
+        boolean insert = (service.imagesDataInsert() != null && !service.imagesDataInsert().isEmpty());
 
         try {
 
-            transferToFile(service.imagesDataInsert(),"");
+            if( insert ) {
 
-            // update images in database
-            for (ImageDto imageDto : service.imagesDataInsert()) {
+                transferToFile(service.imagesDataInsert());
 
-                if (imageDto.isFirstImage()) {
-                    serviceDB.setFirstImage(imageDto.nameFile());//insert path
+                for (ImageDto imageDto : service.imagesDataInsert()) {
+
+                    if (imageDto.isFirstImage()) {
+                        serviceDB.setFirstImage(Paths.get(pathImage,imageDto.nameFile()).toString());//insert path
+                    }
+
+                    images.add(Paths.get(pathImage,imageDto.nameFile()).toString()); // insert path
                 }
 
-                images.add(imageDto.nameFile()); // insert path
             }
-
-
 
             serviceDB.setImages(images);
             repository.save(serviceDB);
             repository.flush();
-            //
 
 
         }
         catch ( DataAccessException databaseError ){
 
             try {
-                    deleteFile( service.imagesDataInsert(),"" );
 
-                } catch ( IOException catchErrorException ) {
-                        throw new RuntimeException( catchErrorException );
-                    }
+              if( insert ) deleteFile( service.imagesDataInsert() );
 
-            throw  new RuntimeException( databaseError );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            throw   databaseError;
 
         }catch (IOException e) {
             throw new RuntimeException(e);
@@ -108,35 +131,49 @@ public class ServServiceImpl implements ServService {
     @Override
     public ServiceDtoComplete getServiceDtoCompleteByName(String serviceName) {
         Service serviceDB = repository.getServiceDtoCompleteByName(serviceName);
-        ServiceDtoComplete serviceDtoComplete = new ServiceDtoComplete(serviceDB.getServiceName(),serviceDB.getImages(),serviceDB.getPrice(),serviceDB.getDescription());;
+        ServiceDtoComplete serviceDtoComplete = new ServiceDtoComplete(serviceDB.getServiceName(), new HashSet<String>( serviceDB.getImages()),serviceDB.getPrice(),serviceDB.getDescription());;
        return serviceDtoComplete;
     }
 
+    @Transactional
     @Override
     public boolean updateService(ServiceDtoCompleteUpload service) {
         Service serviceDB = repository.getServiceDbByName(service.prevServiceName());
         mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
-        HashSet<String> images =(HashSet) serviceDB.getImages();
+        HashSet<String> images =new HashSet<String>( serviceDB.getImages());
+
+        boolean insert = (service.imagesDataInsert() != null && !service.imagesDataInsert().isEmpty());
+        boolean remove = (service.imagesDataRemove() != null && !service.imagesDataRemove().isEmpty());
 
         try {
-            transferToFile(service.imagesDataInsert(),"");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+            if( insert ) transferToFile(service.imagesDataInsert());
+
+            } catch (IOException e) {
+
+                throw new RuntimeException(e);
+
+                }
 
         try {
             // update images in database
-            for (ImageDto imageDto : service.imagesDataInsert()) {
+            if( insert ){
 
-                if (imageDto.isFirstImage()) {
-                    serviceDB.setFirstImage(imageDto.nameFile());//insert path
+                for (ImageDto imageDto : service.imagesDataInsert()) {
+
+                        if (imageDto.isFirstImage()) {
+                                serviceDB.setFirstImage(imageDto.nameFile());//insert path
+                            }
+
+                        images.add(Paths.get(pathImage,imageDto.nameFile()).toString());
+                    }
                 }
 
-                images.add(imageDto.nameFile()); // insert path
-            }
+            if( remove ){
 
-            for (ImageDto imageDto : service.imagesDataRemove()) {
-                images.remove(imageDto.nameFile()); // insert path
+                for (ImageDto imageDto : service.imagesDataRemove()) {
+                             images.remove(Paths.get(pathImage,imageDto.nameFile()).toString());
+                        }
             }
 
 
@@ -145,25 +182,26 @@ public class ServServiceImpl implements ServService {
             repository.flush();
             //
 
+            if( remove ) deleteFile(service.imagesDataRemove());
 
-            deleteFile(service.imagesDataRemove(),"");
-
-        }
-        catch ( DataAccessException databaseError ){
+        } catch ( DataAccessException databaseError ){
 
             try {
-                deleteFile( service.imagesDataInsert(),"" );
+
+                if( insert ) deleteFile( service.imagesDataInsert() );
 
             } catch ( IOException catchErrorException ) {
+
                 throw new RuntimeException( catchErrorException );
+
             }
 
-            throw  new RuntimeException( databaseError );
+            throw  databaseError;
 
-        }
+        } catch ( IOException fileException ) {
 
-        catch ( IOException fileException ) {
             throw new RuntimeException( fileException );
+
         }
 
 
@@ -171,20 +209,37 @@ public class ServServiceImpl implements ServService {
 
     }
 
-    private void transferToFile(List<ImageDto> imagesToSave, String path) throws IOException {
+    private void transferToFile(List<ImageDto> imagesToSave) throws IOException {
+
+        Path directory = Paths.get(pathImage);
+
+        if (!Files.exists(directory)) {
+            Files.createDirectories(directory);
+        }
+
 
         for( ImageDto image : imagesToSave ) {
-            File imageFile = new File(image.nameFile());
-            image.file().transferTo(imageFile);
+
+            if (image.file() == null || image.file().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            Path destinationPath = Paths.get(pathImage, image.nameFile());
+            InputStream inputStream = image.file().getInputStream();
+            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
         }
 
     }
 
-    private void deleteFile(List<ImageDto> imagesToSave, String path) throws IOException {
+    private void deleteFile(List<ImageDto> imagesToDelete) throws IOException {
 
-        for( ImageDto image : imagesToSave ) {
-            File imageFile = new File(image.nameFile());
-            imageFile.delete();
+        for( ImageDto image : imagesToDelete ) {
+
+            File imageFile = new File(Paths.get(pathImage, image.nameFile()).toUri());
+
+            if(imageFile.exists() && imageFile.isFile() ) imageFile.delete();
+
         }
 
     }

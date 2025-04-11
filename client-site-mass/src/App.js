@@ -3,6 +3,7 @@ import './App.css';
 import Calendar from './Calendar'
 import Slider from './Slider';
 import VerticalSlider from './VerticalSlider';
+import CustomerManager from './CustomerManager';
 
 function App() {
   
@@ -14,6 +15,7 @@ function App() {
       <VerticalSlider/>
       <Slider/>
       <Calendar/>
+      <CustomerManager/>
     </div>
   );
 }

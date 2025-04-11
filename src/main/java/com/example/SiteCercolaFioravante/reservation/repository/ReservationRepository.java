@@ -14,7 +14,7 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     @Query("SELECT new com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto" +
-            "(day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
+            "(e.id, day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
             "JOIN e.service serv  " +
             "JOIN e.customer  ctm " +
             "JOIN e.day day " +
@@ -22,7 +22,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<ReservationDto> findReservationsByUserNameAndSurname( @Param("nameSurname") String nameSurname);
 
     @Query("SELECT new com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto" +
-            "(day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
+            "(e.id, day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
             "JOIN e.service serv  " +
             "JOIN e.customer  ctm " +
             "JOIN e.day day " +
@@ -30,7 +30,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<ReservationDto> findReservationsByUserEmail(@Param( "email" ) String email );
 
     @Query("SELECT new com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto" +
-            "(day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
+            "(e.id, day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
             "JOIN e.service serv  " +
             "JOIN e.customer  ctm " +
             "JOIN e.day day " +
@@ -38,7 +38,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<ReservationDto> findReservationsByServiceName( @Param( "serviceName" ) String serviceName );
 
     @Query("SELECT new com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto" +
-            "(day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
+            "(e.id, day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
             "JOIN e.service serv  " +
             "JOIN e.customer  ctm " +
             "JOIN e.day day " +
