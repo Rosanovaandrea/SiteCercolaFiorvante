@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importa Bootstrap CSS
 
 const API_BASE_URL = 'http://localhost:8080/api/customer'; // Assicurati che corrisponda al tuo backend Spring
@@ -72,7 +72,7 @@ const InserisciCliente = () => {
       }
     setIsSubmitting(true);
     try {
-      const response = await axios.post(API_BASE_URL, newCustomer);
+      const response = await axios.post(API_BASE_URL+"/new", newCustomer);
       setMessage(`Cliente inserito con successo!`);
       setError({});
       setNewCustomer({ surname: '', name: '', email: '', phoneNumber: '' }); // Reset del form
@@ -155,19 +155,205 @@ const InserisciCliente = () => {
 };
 
 // Componente placeholder per la modifica del cliente
-const ModificaClientePlaceholder = ({ customerId }) => {
-  // Questo componente prenderà il posto del tuo componente di modifica.
-  // In realtà dovresti recuperare i dati del cliente con l'ID customerId e
-  // mostrare un form di modifica.  Per semplicità, qui mostriamo solo un messaggio.
+const ModificaCliente = () => {
+  const { emailCliente } = useParams()
+  const [cliente, setCliente] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    phoneNumber: '',
+  });
+  const [errors, setErrors] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    phoneNumber: '',
+  });
+  const [loading, setLoading] = useState(true);
+  const [submitError, setSubmitError] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState('');
+
+  useEffect(() => {
+    const fetchCliente = async () => {
+      setLoading(true);
+      setSubmitError('');
+      try {
+        const response = await axios.get(`${API_BASE_URL}/singleCustomer?query=${emailCliente}`);
+        setCliente(response.data);
+      } catch (error) {
+        setSubmitError('Errore nel caricamento dei dati del cliente.');
+        console.error('Errore fetch cliente:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (emailCliente) {
+      fetchCliente();
+    }
+  }, [emailCliente]);
+
+  const validateField = (name, value) => {
+    let error = '';
+    switch (name) {
+      case 'name':
+        if (!value.trim()) {
+          error = 'Il nome è obbligatorio.';
+        }
+        break;
+      case 'surname':
+        if (!value.trim()) {
+          error = 'Il cognome è obbligatorio.';
+        }
+        break;
+      case 'email':
+        if (!value.trim()) {
+          error = 'L\'email è obbligatoria.';
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          error = 'Inserisci un\'email valida.';
+        }
+        break;
+      case 'phoneNumber':
+        if (!value.trim()) {
+          error = 'Il numero di telefono è obbligatorio.';
+        } else if (!/^[0-9]{10}$/.test(value)) {
+          error = 'Il numero di telefono deve contenere 10 cifre.';
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCliente((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: validateField(name, value),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setSubmitError('');
+    setSubmitSuccess('');
+
+    const newErrors = {};
+    for (const key in cliente) {
+      newErrors[key] = validateField(key, cliente[key]);
+    }
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some((error) => error !== '')) {
+      setLoading(false);
+      setSubmitError('Si prega di correggere gli errori nel form.');
+      return;
+    }
+
+    const dataToSend = {
+      prevEmail: emailCliente,
+      surname: cliente.surname,
+      name: cliente.name,
+      role: "CUSTOMER_IN_LOCO",
+      email: cliente.email,
+      phoneNumber: cliente.phoneNumber,
+    };
+
+    try {
+      const response = await axios.post(API_BASE_URL+"/update", dataToSend);
+      console.log('Cliente modificato con successo:', response.data);
+      setSubmitSuccess('Cliente modificato con successo!');
+      // Puoi resettare il form o reindirizzare qui
+    } catch (error) {
+      setSubmitError('Errore durante la modifica del cliente.');
+      console.error('Errore modifica cliente:', error);
+      if (error.response && error.response.data) {
+        console.error('Dettagli errore:', error.response.data);
+        setSubmitError(prevError => `${prevError} ${JSON.stringify(error.response.data)}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="alert alert-info" role="alert">Caricamento dati cliente...</div>;
+  }
+
+  if (submitError) {
+    return <div className="alert alert-danger" role="alert">Errore: {submitError}</div>;
+  }
+
+  if (submitSuccess) {
+    return <div className="alert alert-success" role="alert">{submitSuccess}</div>;
+  }
 
   return (
     <div className="container mt-4">
       <h2>Modifica Cliente</h2>
-      <p>Stai modificando il cliente con ID: {customerId}</p>
-      {/* Qui andrebbe il form di modifica del cliente */}
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label htmlFor="name" className="form-label">Nome:</label>
+          <input
+            type="text"
+            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+            id="name"
+            name="name"
+            value={cliente.name}
+            onChange={handleChange}
+          />
+          {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="surname" className="form-label">Cognome:</label>
+          <input
+            type="text"
+            className={`form-control ${errors.surname ? 'is-invalid' : ''}`}
+            id="surname"
+            name="surname"
+            value={cliente.surname}
+            onChange={handleChange}
+          />
+          {errors.surname && <div className="invalid-feedback">{errors.surname}</div>}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="email" className="form-label">Email:</label>
+          <input
+            type="email"
+            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+            id="email"
+            name="email"
+            value={cliente.email}
+            onChange={handleChange}
+          />
+          {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="phoneNumber" className="form-label">Numero di Telefono:</label>
+          <input
+            type="text"
+            className={`form-control ${errors.phoneNumber ? 'is-invalid' : ''}`}
+            id="phoneNumber"
+            name="phoneNumber"
+            value={cliente.phoneNumber}
+            onChange={handleChange}
+          />
+          {errors.phoneNumber && <div className="invalid-feedback">{errors.phoneNumber}</div>}
+        </div>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Salvataggio...' : 'Salva Modifiche'}
+        </button>
+      </form>
     </div>
   );
 };
+
 
 // Componente per la ricerca dei clienti
 const RicercaClienti = () => {
@@ -179,8 +365,8 @@ const RicercaClienti = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // Hook per la navigazione
 
-    const handleModifica = (customerId) => {
-        navigate(`/modifica/${customerId}`);
+    const handleModifica = (emailCliente) => {
+        navigate(`/modifica/${emailCliente}`);
     };
 
   const handleDelete = async (customerId) => {
@@ -312,7 +498,7 @@ const RicercaClienti = () => {
                   <td>{customer.surname}</td>
                   <td>{customer.email}</td>
                   <td>
-                    <button className="btn btn-primary mr-2" onClick={() => handleModifica(customer.id)}>Modifica</button>
+                    <button className="btn btn-primary mr-2" onClick={() => handleModifica(customer.email)}>Modifica</button>
                     <button className="btn btn-danger" onClick={() => handleDelete(customer.id)}>Elimina</button>
                   </td>
                 </tr>
@@ -357,7 +543,7 @@ const CustomerManager = () => {
                     <Route path="/inserisci" element={<InserisciCliente/>}/>
                     <Route path="/ricerca" element={<RicercaClienti/>}/>
                     <Route path="/" element={<Home/>}/> {/* Pagina di default */}
-                    <Route path="/modifica/:customerId" element={<ModificaClientePlaceholder customerId={""}/>}/>
+                    <Route path="/modifica/:emailCliente" element={<ModificaCliente />}/>
                     {/*Definisci la rotta per il componente ModificaClientePlaceholder*/}
                 </Routes>
             </div>

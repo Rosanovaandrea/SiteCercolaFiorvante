@@ -1,5 +1,6 @@
 package com.example.SiteCercolaFioravante.customer.controller;
 
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
@@ -37,19 +38,25 @@ public class CustomerController {
 
     }
 
+    @GetMapping("/singleCustomer")
+    public ResponseEntity<CustomerDtoSafe> getSingleCustomer(@RequestParam String query){
+        CustomerDtoSafe customer =customerService.getCustomerFromEmail(query);
+
+        return new ResponseEntity<>(customer,HttpStatus.OK);
+    }
+
     @PostMapping(value = {"/new"})
     public ResponseEntity<Boolean> createCustomer(@Valid @RequestBody CustomerDtoSafe customer) {
 
         boolean response = customerService.insertCustomerFromAdmin(customer);
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping(value = {"/update"})
+    public ResponseEntity<Boolean> updateCustomer( @Valid @RequestBody CustomerDtoEditAdmin updatedCustomer) {
 
-    public ResponseEntity<Boolean> updateCustomer( @Valid @RequestBody CustomerDtoEditAdmin updatedBook) {
-
-        boolean response = customerService.editCustomerFromAdmin(updatedBook);
+        boolean response = customerService.editCustomerFromAdmin(updatedCustomer);
 
             return new ResponseEntity<>(response,HttpStatus.OK);
 
