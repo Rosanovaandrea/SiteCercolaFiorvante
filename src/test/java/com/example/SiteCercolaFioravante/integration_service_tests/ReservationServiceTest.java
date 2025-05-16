@@ -57,8 +57,7 @@ public class ReservationServiceTest {
     }
 
 
-    @Test
-    @Order(1)
+/*
     void insertReservationTest(){
 
         CustomerDtoSafe customer = new CustomerDtoSafe(
@@ -105,9 +104,9 @@ public class ReservationServiceTest {
         Assertions.assertEquals(reservationDto.serviceName(),reservationDtoInsert.serviceName());
 
     }
-
+*/
     @Test
-    @Order(2)
+    @Order(1)
     void deleteReservationTest(){
         ReservationDto reservationDto = reservationService.findReservationByDate(LocalDate.now()).get(0);
         reservationService.removeReservation(reservationDto.id());

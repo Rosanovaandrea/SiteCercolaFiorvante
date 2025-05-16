@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name="customer")
+@Table(name="customer",uniqueConstraints = { @UniqueConstraint( columnNames = { "surname", "name", "phoneNumber" } ) } )
 public class Customer {
 
     @Id
@@ -45,7 +45,7 @@ public class Customer {
 
     @NotNull
     @Size(max = 10, min=10)
-    @Column( length = 10, unique = true)
+    @Column(name = "phone_number", length = 10, unique = true)
     private String phoneNumber;
 
     @OneToMany( mappedBy = "customer", cascade = CascadeType.ALL )

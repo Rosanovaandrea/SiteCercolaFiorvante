@@ -3,7 +3,10 @@ import './App.css';
 import Calendar from './Calendar'
 import Slider from './Slider';
 import VerticalSlider from './VerticalSlider';
-import CustomerManager from './CustomerManager';
+import CustomerManager from './customer/CustomerManager';
+import ServiceManager from './service/ServiceManager';
+import InsertReservation from './reservation/InsertReservation';
+import SearchReservations from './reservation/SearchReservation';
 
 function App() {
   
@@ -16,6 +19,9 @@ function App() {
       <Slider/>
       <Calendar/>
       <CustomerManager/>
+      <ServiceManager/>
+      <InsertReservation/>
+      <SearchReservations/>
     </div>
   );
 }

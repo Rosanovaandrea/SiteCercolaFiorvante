@@ -357,7 +357,6 @@ const ModificaCliente = () => {
 
 // Componente per la ricerca dei clienti
 const RicercaClienti = () => {
-  const [searchType, setSearchType] = useState('surname');
   const [searchQuery, setSearchQuery] = useState('');
   const [customers, setCustomers] = useState([]);
   const [error, setError] = useState('');
@@ -385,7 +384,7 @@ const RicercaClienti = () => {
     const fetchCustomers = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${API_BASE_URL}/search?type=${searchType}&query=${searchQuery}`); // Usa un endpoint di ricerca dedicato
+            const response = await axios.get(`${API_BASE_URL}/search?query=${searchQuery}`); // Usa un endpoint di ricerca dedicato
             setCustomers(response.data);
             setError('');
         } catch (error) {
@@ -407,17 +406,10 @@ const RicercaClienti = () => {
         fetchCustomers();
     }, []);
 
-    const searchTypes = [
-        { value: 'surname', label: 'Cognome' },
-        { value: 'name', label: 'Nome' },
-        { value: 'phoneNumber', label: 'Numero di Telefono' },
-        { value: 'email', label: 'Email' },
-    ];
-
   return (
     <div className="container mt-4">
       <h2>Ricerca Clienti</h2>
-      <form onSubmit={handleSearch} className="mb-3">
+      <form className="mb-3">
         <div className="form-row align-items-center">
           <div className="col-auto">
             <label className="mr-2">Cerca per:</label>
@@ -428,7 +420,7 @@ const RicercaClienti = () => {
               onClick={() => setShowDropdown(!showDropdown)}
               style={{ cursor: 'pointer', width: '180px', textAlign: 'left' }}
             >
-              {searchTypes.find(type => type.value === searchType)?.label || 'Tipo di ricerca'}
+          
             </div>
             {showDropdown && (
               <div
@@ -440,19 +432,7 @@ const RicercaClienti = () => {
                   marginTop: '2px',
                 }}
               >
-                {searchTypes.map(type => (
-                  <div
-                    key={type.value}
-                    onClick={() => {
-                      setSearchType(type.value);
-                      setShowDropdown(false);
-                    }}
-                    className="px-2 py-1 hover:bg-light"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {type.label}
-                  </div>
-                ))}
+               
               </div>
             )}
           </div>
@@ -460,7 +440,7 @@ const RicercaClienti = () => {
             <input
               type="text"
               className="form-control"
-              placeholder={`Inserisci ${searchType === 'surname' ? 'cognome' : searchType === 'name' ? 'nome' : searchType === 'phoneNumber' ? 'numero di telefono' : 'email'} da cercare`}
+              placeholder={`Inserisci cognome, nome, numero di telefono o email da cercare`}
               value={searchQuery}
               onChange={(e) =>{ setSearchQuery(e.target.value);
                 fetchCustomers();}
@@ -468,11 +448,7 @@ const RicercaClienti = () => {
               required
             />
           </div>
-          <div className="col-auto">
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? 'Ricerca...' : 'Cerca'}
-            </button>
-          </div>
+        
         </div>
       </form>
 

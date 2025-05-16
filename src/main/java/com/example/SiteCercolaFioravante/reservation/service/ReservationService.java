@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReservationService {
         boolean insertReservation(ReservationDtoInsert reservation);
-        List<ReservationDto> findReservationByUserNameOrUsername(String nameUsername);
+        List<ReservationDto> findReservationByUserEmail(String email);
         List<ReservationDto> findReservationByServiceName(String serviceName);
         List<ReservationDto> findReservationByDate(LocalDate date);
         boolean removeReservation(long id);

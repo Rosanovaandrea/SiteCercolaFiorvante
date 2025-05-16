@@ -1,9 +1,10 @@
 package com.example.SiteCercolaFioravante.customer.repository;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoListProjection;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,20 +15,18 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    @Query("SELECT new com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList(" +
-            " ctm.surname, ctm.name, ctm.email ) FROM Customer ctm WHERE UPPER( ctm.name ) " +
-            "LIKE CONCAT('%', UPPER( :nameSurname ), '%' ) OR  UPPER( ctm.surname ) LIKE CONCAT('%', UPPER( :nameSurname ), '%' ) ")
-    List<CustomerDtoList> getCustomerByNameOrSurname(@Param("nameSurname") String nameSurname);
+    @NativeQuery("(SELECT ctm.surname as surname, ctm.name as name, ctm.email as email FROM customer ctm WHERE LOWER( ctm.name ) LIKE CONCAT(LOWER(:query), '%')LIMIT 3)" + " UNION " +
+                 "(SELECT ctm.surname as surname, ctm.name as name, ctm.email as email FROM customer ctm WHERE LOWER( ctm.surname ) LIKE CONCAT(LOWER(:query), '%') LIMIT 3)" + " UNION " +
+                 "(SELECT ctm.surname as surname, ctm.name as name, ctm.email as email FROM customer ctm WHERE LOWER( ctm.phone_number ) LIKE CONCAT( LOWER(:query), '%') LIMIT 3)" + " UNION " +
+                 "(SELECT ctm.surname as surname, ctm.name as name, ctm.email as email FROM customer ctm WHERE LOWER( ctm.email ) LIKE CONCAT( LOWER(:query), '%') LIMIT 3)")
+    List<CustomerDtoListProjection> getCustomerByNameOrSurname(@Param("query") String query);
 
     @Query("SELECT new com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe" +
             " (ctm.surname, ctm.name, ctm.email, ctm.phoneNumber)" +
             " FROM Customer ctm WHERE  ctm.phoneNumber = :phoneNumber  ")
     CustomerDtoSafe getCustomerByPhoneNumber(@Param("phoneNumber") String phoneNumber);
 
-    @Query("SELECT new com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList" +
-            "(ctm.surname, ctm.name, ctm.email)" +
-            " FROM Customer ctm WHERE UPPER( ctm.email ) LIKE CONCAT('%', UPPER( :email ), '%' )  ")
-    List<CustomerDtoList> getCustomerByEmail(@Param("email") String email);
+
 
     @Query("SELECT ctm.id as id from Customer ctm WHERE ctm.email = :email")
     long getCustomerIdFromEmail(@Param("email") String email );

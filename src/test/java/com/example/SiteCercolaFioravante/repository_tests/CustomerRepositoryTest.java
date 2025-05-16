@@ -2,7 +2,7 @@ package com.example.SiteCercolaFioravante.repository_tests;
 
 import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoListProjection;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -45,17 +45,17 @@ public class CustomerRepositoryTest {
     @Test
     void givenUser_whenSaved_thenCanBeFoundByEmail() {
 
-        CustomerDtoList savedUser =customerRepository.getCustomerByEmail(testCustomer.getEmail()).get(0);
-        assertEquals(testCustomer.getEmail(), savedUser.email());
-        assertEquals(testCustomer.getName(), savedUser.name());
+        CustomerDtoListProjection savedUser =customerRepository.getCustomerByNameOrSurname(testCustomer.getName()).get(0);
+        assertEquals(testCustomer.getEmail(), savedUser.getEmail());
+        assertEquals(testCustomer.getName(), savedUser.getName());
     }
 
     @Test
     void givenUser_whenSaved_thenCanBeFoundBynameUsername() {
 
-        CustomerDtoList savedUser = customerRepository.getCustomerByNameOrSurname(testCustomer.getName()).get(0);
-        assertEquals(testCustomer.getEmail(), savedUser.email());
-        assertEquals(testCustomer.getName(), savedUser.name());
+        CustomerDtoListProjection savedUser = customerRepository.getCustomerByNameOrSurname(testCustomer.getName()).get(0);
+        assertEquals(testCustomer.getEmail(), savedUser.getEmail());
+        assertEquals(testCustomer.getName(), savedUser.getName());
     }
 
     @Test

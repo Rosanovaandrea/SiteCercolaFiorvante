@@ -2,7 +2,7 @@ package com.example.SiteCercolaFioravante.customer.services.impl;
 
 import com.example.SiteCercolaFioravante.customer.*;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoListProjection;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
@@ -27,18 +27,13 @@ public class CustomerServiceImpl implements CustomerService {
     private final MapperCustomer mapper;
 
     @Override
-    public List<CustomerDtoList> getCustomerByNameOrSurname(String nameSurname) {
+    public List<CustomerDtoListProjection> getCustomerByNameOrSurname(String nameSurname) {
         return repository.getCustomerByNameOrSurname(nameSurname);
     }
 
     @Override
     public CustomerDtoSafe getCustomerByPhoneNumber(String phoneNumber) {
         return repository.getCustomerByPhoneNumber(phoneNumber);
-    }
-
-    @Override
-    public List<CustomerDtoList> getCustomerByEmail(String email) {
-        return repository.getCustomerByEmail(email);
     }
 
     @Override

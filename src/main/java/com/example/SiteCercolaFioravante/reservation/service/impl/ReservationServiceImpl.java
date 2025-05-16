@@ -46,8 +46,8 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<ReservationDto> findReservationByUserNameOrUsername(String nameUsername) {
-        return repository.findReservationsByUserNameAndSurname(nameUsername);
+    public List<ReservationDto> findReservationByUserEmail(String email) {
+        return repository.findReservationsByUserEmail(email);
     }
 
     @Override

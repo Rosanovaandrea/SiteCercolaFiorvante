@@ -2,7 +2,7 @@ package com.example.SiteCercolaFioravante.integration_service_tests;
 
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoList;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoListProjection;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
@@ -42,7 +42,7 @@ public class CustomerServiceTest {
         );
 
         customerService.insertCustomerFromAdmin(customer);
-        Assertions.assertEquals(customer.surname(),customerService.getCustomerByNameOrSurname(customer.name()).get(0).surname());
+        Assertions.assertEquals(customer.surname(),customerService.getCustomerByNameOrSurname(customer.name()).get(0).getSurname());
     }
 
 
@@ -50,17 +50,17 @@ public class CustomerServiceTest {
     @Order(2)
     void editCustomerFromAdminTest(){
         //simulate choose from customer list
-        CustomerDtoList customerDtoList = customerService.getCustomerByNameOrSurname("rossi").get(0);
+        CustomerDtoListProjection customerDtoList = customerService.getCustomerByNameOrSurname("rossi").get(0);
 
         //simulate Customer edit
-        CustomerDtoSafe customerDtoSafe = customerService.getCustomerFromEmail(customerDtoList.email());
+        CustomerDtoSafe customerDtoSafe = customerService.getCustomerFromEmail(customerDtoList.getEmail());
         CustomerDtoEditAdmin customer1 = new CustomerDtoEditAdmin(
                 customerDtoSafe.email(),"bianchi","ardemus", CustomerRole.CUSTOMER_IN_LOCO,null,null
         );
         //
 
         customerService.editCustomerFromAdmin(customer1);
-        Assertions.assertEquals(customer1.surname(),customerService.getCustomerByNameOrSurname(customer1.surname()).get(0).surname());
+        Assertions.assertEquals(customer1.surname(),customerService.getCustomerByNameOrSurname(customer1.surname()).get(0).getSurname());
     }
 
 }

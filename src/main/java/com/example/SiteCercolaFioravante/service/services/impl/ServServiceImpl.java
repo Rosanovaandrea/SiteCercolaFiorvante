@@ -1,7 +1,6 @@
 package com.example.SiteCercolaFioravante.service.services.impl;
 
 import com.example.SiteCercolaFioravante.reservation.Reservation;
-import com.example.SiteCercolaFioravante.service.data_transfer_object.ImageDto;
 import com.example.SiteCercolaFioravante.service.data_transfer_object.MapperService;
 import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDtoComplete;
 import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDtoCompleteUpload;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +23,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 @org.springframework.stereotype.Service
 public class ServServiceImpl implements ServService {
@@ -63,31 +64,17 @@ public class ServServiceImpl implements ServService {
 
     @Transactional
     @Override
-    public boolean insertService(ServiceDtoCompleteUpload service) {
+    public boolean insertService(ServiceDtoCompleteUpload service, List<MultipartFile> imagesDto) {
 
         Service serviceDB = new Service();
-
         mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
-
         HashSet<String> images = new HashSet<String>();
-
-        boolean insert = (service.imagesDataInsert() != null && !service.imagesDataInsert().isEmpty());
+        boolean insert = (imagesDto != null && !imagesDto.isEmpty());
 
         try {
 
             if( insert ) {
-
-                transferToFile(service.imagesDataInsert());
-
-                for (ImageDto imageDto : service.imagesDataInsert()) {
-
-                    if (imageDto.isFirstImage()) {
-                        serviceDB.setFirstImage(Paths.get(pathImage,imageDto.nameFile()).toString());//insert path
-                    }
-
-                    images.add(Paths.get(pathImage,imageDto.nameFile()).toString()); // insert path
-                }
-
+               images = transferToFile(imagesDto);
             }
 
             serviceDB.setImages(images);
@@ -100,7 +87,7 @@ public class ServServiceImpl implements ServService {
 
             try {
 
-              if( insert ) deleteFile( service.imagesDataInsert() );
+              if( insert ) deleteFile( images );
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -131,49 +118,33 @@ public class ServServiceImpl implements ServService {
     @Override
     public ServiceDtoComplete getServiceDtoCompleteByName(String serviceName) {
         Service serviceDB = repository.getServiceDtoCompleteByName(serviceName);
-        ServiceDtoComplete serviceDtoComplete = new ServiceDtoComplete(serviceDB.getServiceName(), new HashSet<String>( serviceDB.getImages()),serviceDB.getPrice(),serviceDB.getDescription());;
-       return serviceDtoComplete;
+        HashSet<String>  images = new HashSet<String>();
+        if(serviceDB.getImages()!=null) images.addAll(serviceDB.getImages());
+        ServiceDtoComplete serviceDtoComplete = new ServiceDtoComplete(serviceDB.getServiceName(), images,serviceDB.getPrice(),serviceDB.getDescription());;
+        return serviceDtoComplete;
     }
+
 
     @Transactional
     @Override
-    public boolean updateService(ServiceDtoCompleteUpload service) {
+    public boolean updateService(ServiceDtoCompleteUpload service, List<MultipartFile> imagesToInsert ) {
         Service serviceDB = repository.getServiceDbByName(service.prevServiceName());
         mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
         HashSet<String> images =new HashSet<String>( serviceDB.getImages());
+        HashSet<String> imagesins = new HashSet<String>();
 
-        boolean insert = (service.imagesDataInsert() != null && !service.imagesDataInsert().isEmpty());
+        boolean insert = (imagesToInsert != null && !images.isEmpty());
         boolean remove = (service.imagesDataRemove() != null && !service.imagesDataRemove().isEmpty());
 
         try {
 
-            if( insert ) transferToFile(service.imagesDataInsert());
-
-            } catch (IOException e) {
-
-                throw new RuntimeException(e);
-
-                }
-
-        try {
-            // update images in database
-            if( insert ){
-
-                for (ImageDto imageDto : service.imagesDataInsert()) {
-
-                        if (imageDto.isFirstImage()) {
-                                serviceDB.setFirstImage(imageDto.nameFile());//insert path
-                            }
-
-                        images.add(Paths.get(pathImage,imageDto.nameFile()).toString());
-                    }
-                }
+            if( insert ) {
+                imagesins = transferToFile(imagesToInsert);
+                images.addAll(imagesins);
+            }
 
             if( remove ){
-
-                for (ImageDto imageDto : service.imagesDataRemove()) {
-                             images.remove(Paths.get(pathImage,imageDto.nameFile()).toString());
-                        }
+                images.removeAll(service.imagesDataRemove());
             }
 
 
@@ -188,7 +159,7 @@ public class ServServiceImpl implements ServService {
 
             try {
 
-                if( insert ) deleteFile( service.imagesDataInsert() );
+                if( insert ) deleteFile( imagesins );
 
             } catch ( IOException catchErrorException ) {
 
@@ -209,7 +180,9 @@ public class ServServiceImpl implements ServService {
 
     }
 
-    private void transferToFile(List<ImageDto> imagesToSave) throws IOException {
+    private HashSet<String> transferToFile(List<MultipartFile> imagesToSave) throws IOException {
+
+        HashSet<String> images = new HashSet<String>();
 
         Path directory = Paths.get(pathImage);
 
@@ -218,25 +191,27 @@ public class ServServiceImpl implements ServService {
         }
 
 
-        for( ImageDto image : imagesToSave ) {
+        for( MultipartFile image : imagesToSave ) {
 
-            if (image.file() == null || image.file().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
 
-            Path destinationPath = Paths.get(pathImage, image.nameFile());
-            InputStream inputStream = image.file().getInputStream();
+            String name = UUID.randomUUID().toString()+image.getOriginalFilename();
+            Path destinationPath = Paths.get(pathImage, name);
+            InputStream inputStream = image.getInputStream();
             Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            images.add(name);
+
 
         }
 
+        return images;
+
     }
 
-    private void deleteFile(List<ImageDto> imagesToDelete) throws IOException {
+    private void deleteFile(HashSet<String> imagesToDelete) throws IOException {
 
-        for( ImageDto image : imagesToDelete ) {
+        for( String image : imagesToDelete ) {
 
-            File imageFile = new File(Paths.get(pathImage, image.nameFile()).toUri());
+            File imageFile = new File(Paths.get(pathImage, image).toUri());
 
             if(imageFile.exists() && imageFile.isFile() ) imageFile.delete();
 
