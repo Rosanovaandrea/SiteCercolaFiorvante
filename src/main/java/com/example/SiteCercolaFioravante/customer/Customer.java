@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.LinkedList;
 import java.util.List;
 
-@Data
+@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name="customer",uniqueConstraints = { @UniqueConstraint( columnNames = { "surname", "name", "phoneNumber" } ) } )
@@ -48,7 +49,7 @@ public class Customer {
     @Column(name = "phone_number", length = 10, unique = true)
     private String phoneNumber;
 
-    @OneToMany( mappedBy = "customer", cascade = CascadeType.ALL )
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL )
     private List<Reservation> reservations;
 
 

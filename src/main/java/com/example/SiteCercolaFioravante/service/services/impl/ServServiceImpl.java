@@ -10,8 +10,10 @@ import com.example.SiteCercolaFioravante.service.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +61,9 @@ public class ServServiceImpl implements ServService {
 
     @Override
     public Service getServiceForReservation(String serviceName) {
-        return repository.getServiceDbByName(serviceName);
+        Service service = repository.getServiceDbByName(serviceName);
+        if(service == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST," servizio non valido");
+        return service;
     }
 
     @Transactional
@@ -74,12 +78,16 @@ public class ServServiceImpl implements ServService {
         try {
 
             if( insert ) {
-               images = transferToFile(imagesDto);
+                images = transferToFile(imagesDto);
             }
+
+
 
             serviceDB.setImages(images);
             repository.save(serviceDB);
             repository.flush();
+
+
 
 
         }
@@ -90,7 +98,7 @@ public class ServServiceImpl implements ServService {
               if( insert ) deleteFile( images );
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw  databaseError;
             }
 
             throw   databaseError;
@@ -219,5 +227,5 @@ public class ServServiceImpl implements ServService {
 
     }
 
-    //TO-DO have to implement the image insert, update and service elimination
+    //TO-DO have to implement the service elimination
 }

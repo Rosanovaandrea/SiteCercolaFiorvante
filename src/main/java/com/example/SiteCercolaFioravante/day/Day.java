@@ -13,8 +13,11 @@ import java.util.Set;
 
 
 @Entity
-@Data
+@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@Table(name = "\"day\"")
 public class Day {
 
     @Id
@@ -27,7 +30,7 @@ public class Day {
     @ElementCollection
     Set<Integer> occupiedHour;
 
-    @OneToMany( mappedBy = "day", cascade = CascadeType.ALL )
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL )
     private List<Reservation> reservations;
 
 

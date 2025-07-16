@@ -7,14 +7,15 @@ import com.example.SiteCercolaFioravante.customer.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "day", "hour" } ) } )
-@Data
+@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 public class Reservation {
 
@@ -42,6 +43,7 @@ public class Reservation {
 
     @Min( 0 )
     @Max( 7 )
+    @Column(name = "\"hour\"")
     private int hour;
 
 

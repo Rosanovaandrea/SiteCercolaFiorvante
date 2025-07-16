@@ -23,6 +23,10 @@ public interface CustomerService {
 
     Customer getCustomerFromEmailReservation(String email);
 
+    boolean isAdminPresent();
+
+    boolean insertAdmin(CustomerDtoSafe customer,String password);
+
     CustomerDtoSafe getCustomerFromEmail(String email);
 
     void inserReservationCustomer(Reservation reservation);

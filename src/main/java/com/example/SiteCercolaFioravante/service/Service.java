@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Set;
 
 
-@Data
+@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 public class Service {
@@ -41,7 +43,7 @@ public class Service {
     @Column( nullable = false, length = 1500 )
     private String description;
 
-    @OneToMany( mappedBy = "service" )
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "service" )
     private List<Reservation> reservations;
 
 

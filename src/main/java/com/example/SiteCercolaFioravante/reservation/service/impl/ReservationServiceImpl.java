@@ -10,7 +10,9 @@ import com.example.SiteCercolaFioravante.reservation.service.ReservationService;
 import com.example.SiteCercolaFioravante.service.services.ServService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -64,7 +66,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public boolean removeReservation(long id) {
         Reservation reservation = repository.findById(id).orElse(null);
-        if(reservation == null) throw new IllegalArgumentException();
+        if(reservation == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "prenotazione non valida");
         dayService.deleteReservationFromDay(reservation.getDay().getDate(),reservation.getHour());
         repository.delete(reservation);
         repository.flush();

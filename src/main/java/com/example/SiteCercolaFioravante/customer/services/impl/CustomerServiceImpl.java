@@ -9,10 +9,13 @@ import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.swing.text.html.Option;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,10 +78,27 @@ public class CustomerServiceImpl implements CustomerService {
         return true;
     }
 
+    @Override
+    @Transactional
+    public boolean insertAdmin(CustomerDtoSafe customer,String password) {
+
+        Customer customerDB = mapper.fromDtoSafeToCustomer(customer);
+        customerDB.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        customerDB.setRole(CustomerRole.ADMIN);
+        repository.save(customerDB);
+        repository.flush();
+
+        return true;
+    }
+
+
+
     @Transactional
     @Override
     public boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer) {
         Customer customerDB = repository.findCustomerByEmail(customer.prevEmail()).orElse(null);
+        if(customerDB == null) throw new IllegalArgumentException("utente non esistente");
+        if(customerDB.getRole() == CustomerRole.ADMIN) throw new IllegalArgumentException("non puoi modificare un admin");
         mapper.fromDtoEditAdminToCustomer(customer,customerDB);
         repository.save(customerDB);
         repository.flush();
@@ -88,7 +108,16 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer getCustomerFromEmailReservation(String email) {
-      return  repository.findCustomerByEmail(email).orElse(null);
+        Customer customer = repository.findCustomerByEmail(email).orElse(null);
+        if(customer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"cliente non valido");
+        if(customer.getRole() == CustomerRole.ADMIN) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi inserire una prenotazione su di un admin");
+        return  customer;
+    }
+
+    @Override
+    public boolean isAdminPresent() {
+        Optional<Customer> customerOpt= repository.findCustomerByRole(CustomerRole.ADMIN);
+        return customerOpt.isPresent();
     }
 
     @Override

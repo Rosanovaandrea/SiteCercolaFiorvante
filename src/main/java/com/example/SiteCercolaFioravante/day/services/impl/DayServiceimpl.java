@@ -6,8 +6,10 @@ import com.example.SiteCercolaFioravante.day.repository.DayRepository;
 import com.example.SiteCercolaFioravante.day.services.DayService;
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -31,7 +33,7 @@ public class DayServiceimpl implements DayService {
       if(dayDB.getOccupiedHour() == null)
           dayDB.setOccupiedHour(new HashSet<Integer>());
 
-      if( dayDB.getOccupiedHour().contains(reservation.getHour())) throw new IllegalArgumentException();
+      if( dayDB.getOccupiedHour().contains(reservation.getHour())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non puoi inserire una prenotazione in un'ora già occupata");
 
 
       dayDB.getReservations().add(reservation);
@@ -71,6 +73,7 @@ public class DayServiceimpl implements DayService {
     @Override
     public void deleteReservationFromDay(LocalDate date, int hour) {
         Day dayDB = repository.getSingleDayDB(date);
+        if(dayDB == null || !dayDB.getOccupiedHour().contains(hour)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"data e ora non valida");
         dayDB.getOccupiedHour().remove(hour);
         repository.saveAndFlush(dayDB);
     }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record CustomerDtoComplete(
 
-               long id,
+
   @NotNull     String surname,
   @NotNull     String name,
   @NotNull     String password,

@@ -1,5 +1,8 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.example.SiteCercolaFioravante.TokenType;
 import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
@@ -8,88 +11,194 @@ import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.utils.JwtUtils;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 
 @RequiredArgsConstructor
+@Service
 public class CustomerAuthenticationServiceImpl implements CustomerAuthenticationService {
 
     private final JwtUtils jwtUtils;
     private final CustomerRepository repository;
     private final MapperCustomer mapper;
+    private final JavaMailSender emailSender;
 
 
     @Override
+    @Transactional
     public boolean doEmailPasswordReset(String email) {
-        byte[] code = new byte[4];
-        Random codeGenerator = new Random();
-        codeGenerator.nextBytes(code);
-        String tokenString = jwtUtils.createToken(Arrays.toString(code));
-        repository.setToken(tokenString,email);
+
+        Customer customer = repository.findCustomerByEmail(email).orElse(null);
+        if(customer!=null) {
+            String tokenId = UUID.randomUUID().toString();
+            String tokenString = jwtUtils.createRefreshOrPasswordResetToken(tokenId,Long.toString(customer.getId()), TokenType.RESET_PASSWORD);
+            repository.setToken(tokenId, email);
+            sendMessageEmail(email, "reset Password", tokenString + " " + email);
+        }
         return true;
     }
 
     @Override
-    public CustomerDtoSafe doPasswordReset(String password) {
-        return null;
+    @Transactional
+    public boolean doPasswordReset( String token, String password) {
+
+        String[] info;
+
+        try {
+            info = jwtUtils.getTokenRefreshOrPasswordResetInfo(token).split(" ");
+        }catch(JWTVerificationException e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Link non valido");
+        }
+
+
+        Customer customer = repository.findById(Long.parseLong(info[0])).orElse(null);
+
+        if(customer == null){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Utente non registrato");
+        }
+        if(!customer.getTokenRegistration().equals(info[1]) || !info[2].equals(TokenType.RESET_PASSWORD.toString())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Link non valido");
+        }
+
+
+        customer.setPassword(BCrypt.hashpw(password.getBytes(StandardCharsets.UTF_8), BCrypt.gensalt()));
+        customer.setTokenRegistration(null);
+
+        repository.saveAndFlush(customer);
+        return true;
+
+
     }
 
     @Override
-    public String doLogin(String email, String password) {
+    public String[] doLogin(String email, String password) {
 
 
-        Long id = repository.getCustomerIdFromEmail(email);
+        Optional<Customer> opt = repository.findCustomerByEmail(email);
 
-        if(id == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utente non trovato");
+        if(opt.isEmpty())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password o email non valida");
 
 
-        String passwordFromDB = repository.getCustomerPasswordFromEmail(email);
+        String passwordFromDB = opt.get().getPassword();
 
-        if (BCrypt.checkpw(password, passwordFromDB))
-            return jwtUtils.createToken(email);
+        if (BCrypt.checkpw(password, passwordFromDB)){
+
+            String idRegistrationToken = UUID.randomUUID().toString();
+
+            opt.get().setTokenRegistration(idRegistrationToken);
+            repository.saveAndFlush(opt.get());
+
+
+
+            return new String[] {jwtUtils.createRefreshOrPasswordResetToken(idRegistrationToken,Long.toString(opt.get().getId()),TokenType.REFRESH_TOKEN),
+                                jwtUtils.createAccessToken(Long.toString(opt.get().getId()),opt.get().getRole().toString())};
+
+            }
         else
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"password non valida");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"password o email non valida");
 
     }
 
     @Override
-    public String doRegistration(CustomerDtoComplete customer) {
+    @Transactional
+    public String[] doRegistration(CustomerDtoComplete customer) {
 
-            Customer customerDB = new Customer();
-            mapper.fromDtoCompleteToCustomer(customer);
+            Customer customerDB = mapper.fromDtoCompleteToCustomer(customer);
             customerDB.setRole(CustomerRole.CUSTOMER);
 
             String password = BCrypt.hashpw(customer.password(), BCrypt.gensalt());
 
             customerDB.setPassword(password);
 
+            String idRegistrationToken = UUID.randomUUID().toString();
+
+            customerDB.setTokenRegistration(idRegistrationToken);
+
             repository.save(customerDB);
             repository.flush();
 
-          return  jwtUtils.createToken(customer.email());
+        return new String[] {jwtUtils.createRefreshOrPasswordResetToken(idRegistrationToken,Long.toString(customerDB.getId()),TokenType.REFRESH_TOKEN),
+                jwtUtils.createAccessToken(Long.toString(customerDB.getId()),customerDB.getRole().toString())};
 
     }
 
+    private void sendMessageEmail(String to,String subject,String text){
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setFrom("ardemusfrizzo@gmail.com");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+
+        emailSender.send(message);
+    }
+
+
+
+
+
+    @Override
+    public String doRefreshAccessToken(String token) {
+
+        Customer customer = null;
+        String[] info;
+
+        try{
+        info = jwtUtils.getTokenRefreshOrPasswordResetInfo(token).split(" ");
+        }catch(JWTVerificationException e){
+            System.err.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "refresh token non valido");
+        }
+
+        customer = repository.findById(Long.parseLong(info[0])).orElse(null);
+
+        if(
+                customer == null ||
+                customer.getTokenRegistration() == null ||
+                !customer.getTokenRegistration().equals(info[1]) ||
+                !info[2].equals(TokenType.REFRESH_TOKEN.toString())
+        ) {
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"refresh token non valido");
+
+            }
+
+        return jwtUtils.createAccessToken(Long.toString(customer.getId()),customer.getRole().toString());
+
+
+    }
+
+
+
     @Override
     public Authentication doAuthentication(String token) {
-        String email = jwtUtils.getTokenEmail(token);
-        LocalDateTime expiration = jwtUtils.getTokenLocalDate(token);
-        Customer customer = repository.findCustomerByEmail( email).orElse(null);
-        LocalDateTime now =  LocalDateTime.now();
+        String[] info = jwtUtils.getTokenAccessId(token);
         List<SimpleGrantedAuthority> authorities = new LinkedList<SimpleGrantedAuthority>();
-        String role = CustomerRole.CUSTOMER.toString();
-        authorities.add(new SimpleGrantedAuthority(role));
-        return new UsernamePasswordAuthenticationToken(customer,token, authorities);
+        authorities.add(new SimpleGrantedAuthority(info[1]));
+        return new UsernamePasswordAuthenticationToken(info[0],token, authorities);
     }
 }

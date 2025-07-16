@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import javax.swing.text.html.Option;
+
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -34,7 +38,7 @@ public class CustomerRepositoryTest {
         testCustomer.setName("andres");
         testCustomer.setSurname("rosanova");
         testCustomer.setPassword("cheeks");
-        testCustomer.setRole(CustomerRole.ADMIN);
+        testCustomer.setRole(CustomerRole.CUSTOMER);
         testCustomer.setPhoneNumber("3333333333");
         customerRepository.save(testCustomer);
         customerRepository.flush();
@@ -69,7 +73,15 @@ public class CustomerRepositoryTest {
     @Test
     void findCustomerByEmailTest(){
         Customer customer = customerRepository.findCustomerByEmail(testCustomer.getEmail()).orElse(null);
-        Assertions.assertEquals(customer.getEmail(),testCustomer.getEmail());
+        assertEquals(customer.getEmail(),testCustomer.getEmail());
+    }
+
+    @Test
+    void findCustomerByRoleTest(){
+        Optional<Customer> customerOpt = customerRepository.findCustomerByRole(CustomerRole.CUSTOMER);
+        Customer customer = null;
+        if(customerOpt.isPresent()) customer = customerOpt.get();
+        assertEquals(customer.getEmail(),testCustomer.getEmail());
     }
 
     @AfterEach
