@@ -1,26 +1,18 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.SiteCercolaFioravante.TokenType;
 import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.utils.JwtUtils;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,10 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -55,7 +43,8 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
         if(customer!=null) {
             String tokenId = UUID.randomUUID().toString();
             String tokenString = jwtUtils.createRefreshOrPasswordResetToken(tokenId,Long.toString(customer.getId()), TokenType.RESET_PASSWORD);
-            repository.setToken(tokenId, email);
+            customer.setTokenRegistration(tokenId);
+            repository.save(customer);
             sendMessageEmail(email, "reset Password", tokenString + " " + email);
         }
         return true;

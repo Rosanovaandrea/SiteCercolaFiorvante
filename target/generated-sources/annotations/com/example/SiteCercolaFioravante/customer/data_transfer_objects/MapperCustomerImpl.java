@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-28T17:03:38+0200",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.6 (JetBrains s.r.o.)"
+    date = "2025-07-24T15:01:28+0200",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (JetBrains s.r.o.)"
 )
 @Component
 public class MapperCustomerImpl implements MapperCustomer {
@@ -18,14 +18,14 @@ public class MapperCustomerImpl implements MapperCustomer {
             return;
         }
 
+        if ( customerDtoEditAdmin.id() != null ) {
+            customer.setId( customerDtoEditAdmin.id() );
+        }
         if ( customerDtoEditAdmin.surname() != null ) {
             customer.setSurname( customerDtoEditAdmin.surname() );
         }
         if ( customerDtoEditAdmin.name() != null ) {
             customer.setName( customerDtoEditAdmin.name() );
-        }
-        if ( customerDtoEditAdmin.email() != null ) {
-            customer.setEmail( customerDtoEditAdmin.email() );
         }
         if ( customerDtoEditAdmin.role() != null ) {
             customer.setRole( customerDtoEditAdmin.role() );
@@ -43,11 +43,9 @@ public class MapperCustomerImpl implements MapperCustomer {
 
         Customer customer = new Customer();
 
-        customer.setId( customerDtoComplete.id() );
         customer.setSurname( customerDtoComplete.surname() );
         customer.setName( customerDtoComplete.name() );
         customer.setPassword( customerDtoComplete.password() );
-        customer.setEmail( customerDtoComplete.email() );
         customer.setPhoneNumber( customerDtoComplete.phoneNumber() );
 
         return customer;
@@ -61,9 +59,11 @@ public class MapperCustomerImpl implements MapperCustomer {
 
         Customer customer = new Customer();
 
+        if ( customerDtoSafe.id() != null ) {
+            customer.setId( customerDtoSafe.id() );
+        }
         customer.setSurname( customerDtoSafe.surname() );
         customer.setName( customerDtoSafe.name() );
-        customer.setEmail( customerDtoSafe.email() );
         customer.setPhoneNumber( customerDtoSafe.phoneNumber() );
 
         return customer;

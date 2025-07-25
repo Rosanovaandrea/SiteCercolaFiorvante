@@ -30,37 +30,4 @@ public class CustomerServiceTest {
     }
 
 
-
-
-    @Test
-    @Order(1)
-    void insertCustomerFromAdminTest(){
-
-
-        CustomerDtoSafe customer = new CustomerDtoSafe(
-                "andrea","rossi","","1111114111"
-        );
-
-        customerService.insertCustomerFromAdmin(customer);
-        Assertions.assertEquals(customer.surname(),customerService.getCustomerByNameOrSurname(customer.name()).get(0).getSurname());
-    }
-
-
-    @Test
-    @Order(2)
-    void editCustomerFromAdminTest(){
-        //simulate choose from customer list
-        CustomerDtoListProjection customerDtoList = customerService.getCustomerByNameOrSurname("rossi").get(0);
-
-        //simulate Customer edit
-        CustomerDtoSafe customerDtoSafe = customerService.getCustomerFromEmail(customerDtoList.getEmail());
-        CustomerDtoEditAdmin customer1 = new CustomerDtoEditAdmin(
-                customerDtoSafe.email(),"bianchi","ardemus", CustomerRole.CUSTOMER_IN_LOCO,null,null
-        );
-        //
-
-        customerService.editCustomerFromAdmin(customer1);
-        Assertions.assertEquals(customer1.surname(),customerService.getCustomerByNameOrSurname(customer1.surname()).get(0).getSurname());
-    }
-
 }

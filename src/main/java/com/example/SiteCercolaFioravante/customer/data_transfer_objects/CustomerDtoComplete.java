@@ -10,6 +10,5 @@ public record CustomerDtoComplete(
   @NotNull     String surname,
   @NotNull     String name,
   @NotNull     String password,
-  @NotNull @Email String email,
   @NotNull     String phoneNumber) {
 }

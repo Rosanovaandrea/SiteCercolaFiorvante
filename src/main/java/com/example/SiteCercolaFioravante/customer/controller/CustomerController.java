@@ -3,6 +3,7 @@ package com.example.SiteCercolaFioravante.customer.controller;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoEditAdmin;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoListProjection;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerSafeProjection;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/customer")
 @RequiredArgsConstructor
@@ -24,18 +24,18 @@ public class CustomerController {
 
     @GetMapping("/search")
     public ResponseEntity<List<CustomerDtoListProjection>> getCustomers( @RequestParam String query) {
-        List<CustomerDtoListProjection> customer = null;
+        List<CustomerDtoListProjection> customers = null;
 
         if(query != null && !query.isEmpty())
-        {customer = customerService.getCustomerByNameOrSurname(query);}
+        {customers = customerService.getCustomerByNameOrSurname(query);}
 
-        return new ResponseEntity<>(customer, HttpStatus.OK);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
 
     }
 
     @GetMapping("/singleCustomer")
-    public ResponseEntity<CustomerDtoSafe> getSingleCustomer(@RequestParam String query){
-        CustomerDtoSafe customer =customerService.getCustomerFromEmail(query);
+    public ResponseEntity<CustomerSafeProjection> getSingleCustomer(@RequestParam Long id){
+        CustomerSafeProjection customer =customerService.getCustomerFromID(id);
 
         return new ResponseEntity<>(customer,HttpStatus.OK);
     }

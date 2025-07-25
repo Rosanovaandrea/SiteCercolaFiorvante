@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name="customer",uniqueConstraints = { @UniqueConstraint( columnNames = { "surname", "name", "phoneNumber" } ) } )
+@Table(name="customer")
 public class Customer {
 
     @Id
@@ -29,8 +29,7 @@ public class Customer {
     @Column( nullable = false )
     private String name;
 
-    @NotNull
-    @Column(nullable = false)
+
     private String password;
 
     @Email
@@ -45,7 +44,7 @@ public class Customer {
     private String tokenRegistration;
 
     @NotNull
-    @Size(max = 10, min=10)
+    @Size(max = 10, min = 10)
     @Column(name = "phone_number", length = 10, unique = true)
     private String phoneNumber;
 
