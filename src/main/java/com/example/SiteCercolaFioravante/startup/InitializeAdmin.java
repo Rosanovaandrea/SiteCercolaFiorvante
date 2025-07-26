@@ -44,6 +44,7 @@ public class InitializeAdmin {
             customer.setEmail(email);
             customer.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
             customer.setPhoneNumber(number);
+            customer.setRole(CustomerRole.ADMIN);
 
             repository.saveAndFlush(customer);
         }

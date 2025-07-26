@@ -12,7 +12,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "day", "hour" } ) } )
+@Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "day_date", "hour" } ) } )
 @AllArgsConstructor
 @Getter
 @Setter
@@ -20,7 +20,7 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 public class Reservation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne

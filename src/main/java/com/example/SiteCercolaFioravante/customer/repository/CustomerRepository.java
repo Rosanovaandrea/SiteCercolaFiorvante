@@ -19,10 +19,10 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    @NativeQuery("(SELECT ctm.id as id, ctm.surname as surname, ctm.name as name  FROM customer ctm WHERE ctm.role != 'ADMIN' AND LOWER( ctm.name ) LIKE CONCAT(LOWER(:query), '%')LIMIT 3)" + " UNION " +
-                 "(SELECT ctm.id as id, ctm.surname as surname, ctm.name as name  FROM customer ctm WHERE ctm.role != 'ADMIN' AND LOWER( ctm.surname ) LIKE CONCAT(LOWER(:query), '%') LIMIT 3)" + " UNION " +
-                 "(SELECT ctm.id as id, ctm.surname as surname, ctm.name as name  FROM customer ctm WHERE ctm.role != 'ADMIN' AND LOWER( ctm.phone_number ) LIKE CONCAT( LOWER(:query), '%') LIMIT 3)" + " UNION " +
-                 "(SELECT ctm.id as id, ctm.surname as surname, ctm.name as name  FROM customer ctm WHERE ctm.role != 'ADMIN' AND LOWER( ctm.email ) LIKE CONCAT( LOWER(:query), '%') LIMIT 3)"
+    //query ottimizzata per utilizzare gli indici funzionali
+    @NativeQuery("(SELECT ctm.id as id, ctm.surname as surname, ctm.name as name  FROM customer ctm WHERE ctm.role != 'ADMIN' AND  ctm.name_lower LIKE CONCAT(LOWER(:query), '%')LIMIT 3)" + " UNION " +
+                 "(SELECT ctm.id as id, ctm.surname as surname, ctm.name as name  FROM customer ctm WHERE ctm.role != 'ADMIN' AND ctm.surname_lower LIKE CONCAT(LOWER(:query), '%') LIMIT 3)" + " UNION " +
+                 "(SELECT ctm.id as id, ctm.surname as surname, ctm.name as name  FROM customer ctm WHERE ctm.role != 'ADMIN' AND ctm.phone_number  LIKE CONCAT( :query, '%') LIMIT 3)"
                  )
     List<CustomerDtoListProjection> getCustomerByNameOrSurname(@Param("query") String query);
 
