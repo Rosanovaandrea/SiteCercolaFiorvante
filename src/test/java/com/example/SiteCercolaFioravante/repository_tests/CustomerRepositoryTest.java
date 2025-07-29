@@ -4,6 +4,7 @@ import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoListProjection;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
+import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerSafeProjection;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,16 @@ public class CustomerRepositoryTest {
         Optional<Customer> customerOptNotPresent = customerRepository.findCustomerByRole(CustomerRole.ADMIN);
         assertTrue(customerOptNotPresent.isEmpty());
     }
+
+     @Test
+     void finCustomerById(){
+
+        Optional<CustomerSafeProjection> customer = customerRepository.findCustomerDtoSafeByID(testCustomer.getId());
+        assertTrue(customer.isPresent());
+        assertEquals(testCustomer.getId(),customer.get().getId());
+     }
+
+
 
     @AfterAll
     public static void tearDown() {

@@ -58,9 +58,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
         try {
             info = jwtUtils.getTokenRefreshOrPasswordResetInfo(token).split(" ");
-        }catch(JWTVerificationException e){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Link non valido");
-        }
+
 
 
         Customer customer = repository.findById(Long.parseLong(info[0])).orElse(null);
@@ -78,6 +76,10 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
         repository.saveAndFlush(customer);
         return true;
+
+        }catch(JWTVerificationException e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Link non valido");
+        }
 
 
     }
@@ -158,10 +160,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
         try{
         info = jwtUtils.getTokenRefreshOrPasswordResetInfo(token).split(" ");
-        }catch(JWTVerificationException e){
-            System.err.println(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "refresh token non valido");
-        }
+
 
         customer = repository.findById(Long.parseLong(info[0])).orElse(null);
 
@@ -178,6 +177,11 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
         return jwtUtils.createAccessToken(Long.toString(customer.getId()),customer.getRole().toString());
 
+        }catch(JWTVerificationException e){
+            System.err.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "refresh token non valido");
+
+        }
 
     }
 

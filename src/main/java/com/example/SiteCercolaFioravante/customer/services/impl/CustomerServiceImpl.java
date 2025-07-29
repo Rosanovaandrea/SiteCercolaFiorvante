@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDtoListProjection> getCustomerByNameOrSurname(String nameSurname) {
+        if(nameSurname.isBlank()) return Collections.emptyList();
         return repository.getCustomerByNameOrSurname(nameSurname);
     }
 
@@ -36,14 +39,17 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerDB.setRole(CustomerRole.CUSTOMER_IN_LOCO);
 
+
+
         try {
             repository.save(customerDB);
             repository.flush();
+            return true;
         }catch (ConstraintViolationException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
         }
 
-        return true;
+
     }
 
 
@@ -58,13 +64,16 @@ public class CustomerServiceImpl implements CustomerService {
         if(customerDB.getRole() == CustomerRole.ADMIN) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi modificare un admin");
         mapper.fromDtoEditAdminToCustomer(customer,customerDB);
 
+
         try {
             repository.save(customerDB);
             repository.flush();
+            return true;
+
         }catch (ConstraintViolationException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
         }
-        return true;
+
     }
 
 

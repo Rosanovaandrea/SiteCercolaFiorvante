@@ -6,6 +6,8 @@ import com.example.SiteCercolaFioravante.customer.data_transfer_objects.Customer
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerSafeProjection;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class CustomerController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<List<CustomerDtoListProjection>> getCustomers( @RequestParam String query) {
+    public ResponseEntity<List<CustomerDtoListProjection>> getCustomers(@Size(max = 50) @NotNull @RequestParam String query) {
         List<CustomerDtoListProjection> customers = null;
 
         if(query != null && !query.isEmpty())
@@ -34,7 +36,7 @@ public class CustomerController {
     }
 
     @GetMapping("/singleCustomer")
-    public ResponseEntity<CustomerSafeProjection> getSingleCustomer(@RequestParam Long id){
+    public ResponseEntity<CustomerSafeProjection> getSingleCustomer(@NotNull @RequestParam Long id){
         CustomerSafeProjection customer =customerService.getCustomerFromID(id);
 
         return new ResponseEntity<>(customer,HttpStatus.OK);

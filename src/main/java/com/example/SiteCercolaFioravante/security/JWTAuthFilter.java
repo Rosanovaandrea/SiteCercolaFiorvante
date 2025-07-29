@@ -45,20 +45,27 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             String header = request.getHeader( HttpHeaders.AUTHORIZATION );
 
             String[] elements = header.split( " " );
-            String token = null;
+            String token;
 
-            if(elements[0].equals( BEARER )) {
-                token = elements[1];
+            if( !(elements.length == 2) || !elements[0].equals( BEARER ) ) {
+               throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "richiesta non valida");
             }
+                token = elements[1];
+
 
             SecurityContextHolder.getContext().setAuthentication( userAuthProvider.doAuthentication( token ) );
 
-            } catch ( JWTVerificationException e ) {
+            filterChain.doFilter(request, response);
+
+            } catch ( JWTVerificationException  | ResponseStatusException e) {
                 SecurityContextHolder.clearContext();
                 resolver.resolveException(request, response, null, e);
-            }catch( Exception  e){
+            }
+        catch( Exception  e){
                 SecurityContextHolder.clearContext();
                 resolver.resolveException(request, response, null, new ResponseStatusException( HttpStatus.UNAUTHORIZED,"richiesta non autorizzata" ) );
             }
+
+
     }
 }
