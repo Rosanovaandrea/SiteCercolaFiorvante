@@ -21,6 +21,7 @@ public interface CustomerService {
 
     Customer getCustomerFromEmailReservation(String email);
 
+    boolean deleteCustomer(Long id);
 
     CustomerSafeProjection getCustomerFromID(Long Id);
 
