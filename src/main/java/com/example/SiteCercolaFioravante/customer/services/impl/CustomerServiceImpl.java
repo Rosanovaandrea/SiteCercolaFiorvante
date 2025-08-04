@@ -5,13 +5,12 @@ import com.example.SiteCercolaFioravante.customer.data_transfer_objects.*;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import com.example.SiteCercolaFioravante.reservation.Reservation;
-import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,13 +38,11 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerDB.setRole(CustomerRole.CUSTOMER_IN_LOCO);
 
-
-
         try {
             repository.save(customerDB);
             repository.flush();
             return true;
-        }catch (ConstraintViolationException e){
+        }catch (DataIntegrityViolationException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
         }
 
@@ -70,7 +67,7 @@ public class CustomerServiceImpl implements CustomerService {
             repository.flush();
             return true;
 
-        }catch (ConstraintViolationException e){
+        }catch (DataIntegrityViolationException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
         }
 
@@ -83,6 +80,17 @@ public class CustomerServiceImpl implements CustomerService {
         if(customer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"cliente non esistente");
         if(customer.getRole() == CustomerRole.ADMIN) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi inserire una prenotazione su di un admin");
         return  customer;
+    }
+
+    @Override
+    public boolean deleteCustomer(Long id) {
+
+        if(!repository.existsById(id))
+            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"cliente non esistente");
+
+        repository.deleteById(id);
+
+        return true;
     }
 
     @Override

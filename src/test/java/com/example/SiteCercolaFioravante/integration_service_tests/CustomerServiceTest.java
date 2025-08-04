@@ -8,11 +8,14 @@ import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -149,6 +152,55 @@ public class CustomerServiceTest {
         Assertions.assertEquals(newName,customerEdit.getName());
         customer1= customerEdit; // important to synchronize the customer with database
     }
+
+
+    @Test
+    void testEditFromAdminWrong(){
+       final CustomerDtoEditAdmin customerDtoEditAdminNoAdmins = new CustomerDtoEditAdmin(
+                customer.getId(),customer.getSurname(),customer.getName(),customer.getRole(),customer.getPhoneNumber()
+        );
+
+       ResponseStatusException e= Assertions.assertThrows(ResponseStatusException.class,()->{customerService.editCustomerFromAdmin(customerDtoEditAdminNoAdmins);});
+
+       Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+
+
+       final CustomerDtoEditAdmin customerDtoEditAdminWrongId = new CustomerDtoEditAdmin(
+                1000L,customer.getSurname(),customer.getName(),customer.getRole(),customer.getPhoneNumber()
+        );
+
+       e= Assertions.assertThrows(ResponseStatusException.class,()->{customerService.editCustomerFromAdmin(customerDtoEditAdminWrongId);});
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+
+    }
+
+    @Test
+    void testSearchFromID(){
+        Assertions.assertEquals(customer1.getId(),customerService.getCustomerFromID(customer1.getId()).getId());
+    }
+
+    @Test
+    void testSearchFromIDWrong(){
+        ResponseStatusException e = Assertions.assertThrows(ResponseStatusException.class,()->{customerService.getCustomerFromID(1000L);});
+        Assertions.assertEquals(HttpStatus.NOT_FOUND,e.getStatusCode());
+    }
+
+    @Test
+    void testInsertCustomer(){
+        CustomerDtoSafe insert = new CustomerDtoSafe("castello","antonio","3233233232");
+        customerService.insertCustomerFromAdmin(insert);
+    }
+
+    @Test
+    void testInsertCustomerNumberAlredyExistent(){
+       final CustomerDtoSafe insert = new CustomerDtoSafe("castello","antonio",customer.getPhoneNumber());
+       ResponseStatusException e = Assertions.assertThrows(ResponseStatusException.class,()->{customerService.insertCustomerFromAdmin(insert);});
+       Assertions.assertEquals(HttpStatus.BAD_REQUEST,e.getStatusCode());
+    }
+
+
+
 
     @AfterAll
     static void cleanup(){
