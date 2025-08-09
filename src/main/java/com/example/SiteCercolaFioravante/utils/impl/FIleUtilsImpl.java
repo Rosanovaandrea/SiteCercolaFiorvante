@@ -52,7 +52,7 @@ public class FIleUtilsImpl {
 
         ListIterator<MultipartFile> dataImage = imagesToSave.listIterator();
 
-        LinkedHashSet<String> filesTORemove = new LinkedHashSet<String>();
+        LinkedHashSet<String> filesTORemove = new LinkedHashSet<>();
 
         try{
         for( String imageName : imageNames ) {
@@ -92,7 +92,7 @@ public class FIleUtilsImpl {
         }
     }
 
-    public void deleteFiles (LinkedHashSet<String>fileToRevert, LinkedList<String> fileTORemove,String pathImage) throws IOException {
+    public void deleteFiles (LinkedList<String> fileTORemove,String pathImage) throws IOException {
 
         Path destinationDirectoryPath = Paths.get(pathImage);
 
@@ -102,7 +102,7 @@ public class FIleUtilsImpl {
 
         Files.createDirectories(tempDirectoryPath);
 
-        LinkedList<String> fileToBackup = new LinkedList<String>();
+        LinkedList<String> fileToBackup = new LinkedList<>();
 
         try{
         for( String imageName : fileTORemove ) {
@@ -112,7 +112,7 @@ public class FIleUtilsImpl {
             Files.move(destinationToRemove,backupPath,StandardCopyOption.ATOMIC_MOVE);
         }
         }catch(Exception e){
-            restoreBackup(fileToRevert,tempDirectoryPath,destinationDirectoryPath,fileToBackup);
+            restoreBackup(tempDirectoryPath,destinationDirectoryPath,fileToBackup);
             throw e;
         }finally {
 
@@ -123,7 +123,7 @@ public class FIleUtilsImpl {
 
     }
 
-    private void cleanUpDirectory(Path directory) throws IOException {
+    private void cleanUpDirectory(Path directory){
         if (Files.exists(directory)) {
             try (Stream<Path> pathStream = Files.walk(directory)) {
                 pathStream.sorted(Comparator.reverseOrder()).forEach(path -> {
@@ -139,7 +139,7 @@ public class FIleUtilsImpl {
         }
     }
 
-    private void restoreBackup(LinkedHashSet<String> fileToRemove,Path directoryBackup ,Path directoryRestore,LinkedList<String> fileToRestore) throws IOException {
+    private void restoreBackup(Path directoryBackup ,Path directoryRestore,LinkedList<String> fileToRestore) throws IOException {
        try{
         for( String imageName : fileToRestore ) {
             Path backupPath = directoryBackup.resolve(imageName);
