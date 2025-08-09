@@ -137,7 +137,13 @@
 			<artifactId>flyway-core</artifactId>
 			<version>11.10.4</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
 	</dependencies>
 
 	<build>
