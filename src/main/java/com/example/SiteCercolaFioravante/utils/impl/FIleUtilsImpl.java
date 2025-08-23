@@ -2,6 +2,7 @@ package com.example.SiteCercolaFioravante.utils.impl;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -21,17 +20,20 @@ import java.util.stream.Stream;
 public class FIleUtilsImpl {
 
     private final String tempPath;
+    private final FIleUtilsStaticWrapper fileUtilsStaticWrapper;
 
-    public FIleUtilsImpl(@Value("${temp.path}") @NotNull String tempPath) {
+    public FIleUtilsImpl(@Value("${temp.path}") @NotNull String tempPath ,
+                         @Autowired FIleUtilsStaticWrapper fileUtilsStaticWrapper) {
         this.tempPath = tempPath;
+        this.fileUtilsStaticWrapper = fileUtilsStaticWrapper;
     }
 
     public HashSet<String> getImageNames(@org.jetbrains.annotations.NotNull List<MultipartFile> imagesToSave){
 
         LinkedHashSet<String> images = new LinkedHashSet<>();
-        for( MultipartFile image : imagesToSave ) {
+        for( int i = 0; i < imagesToSave.size(); i++ ) {
 
-            String name = UUID.randomUUID()+image.getOriginalFilename();
+            String name = fileUtilsStaticWrapper.getUUID().toString();
             images.add(name);
 
         }
@@ -42,13 +44,13 @@ public class FIleUtilsImpl {
 
         if(imagesToSave.size() != imageNames.size()) throw new IllegalArgumentException("The number of filenames does not match the number of files. Data is out of sync.");
 
-        Path destinationDirectoryPath = Paths.get(pathImage);
+        Path destinationDirectoryPath = fileUtilsStaticWrapper.getPath(pathImage);
 
-        Files.createDirectories(destinationDirectoryPath);
+        fileUtilsStaticWrapper.createDirectories(destinationDirectoryPath);
 
-        Path tempDirectoryPath = Paths.get(tempPath).resolve(UUID.randomUUID().toString());
+        Path tempDirectoryPath = fileUtilsStaticWrapper.getPath(tempPath).resolve(fileUtilsStaticWrapper.getUUID().toString());
 
-        Files.createDirectories(tempDirectoryPath);
+        fileUtilsStaticWrapper.createDirectories(tempDirectoryPath);
 
         ListIterator<MultipartFile> dataImage = imagesToSave.listIterator();
 
@@ -58,7 +60,7 @@ public class FIleUtilsImpl {
         for( String imageName : imageNames ) {
             Path destinationPath = tempDirectoryPath.resolve(imageName);
             try (InputStream inputStream = dataImage.next().getInputStream()) {
-                Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                fileUtilsStaticWrapper.copyFile(inputStream, destinationPath);
             }
 
         }
@@ -67,7 +69,7 @@ public class FIleUtilsImpl {
             filesTORemove.add(imageName);
             Path sourcePath = tempDirectoryPath.resolve(imageName);
             Path destinationPath = destinationDirectoryPath.resolve(imageName);
-            Files.move(sourcePath,destinationPath,StandardCopyOption.ATOMIC_MOVE);
+            fileUtilsStaticWrapper.moveFile(sourcePath,destinationPath);
         }
         }catch (Exception e){
             reverInsert(filesTORemove, destinationDirectoryPath);
@@ -83,7 +85,7 @@ public class FIleUtilsImpl {
         try {
             for (String fileName : deleterFiles) {
                 Path filePath = pathImage.resolve(fileName);
-                if (Files.exists(filePath)) Files.delete(filePath);
+                if (fileUtilsStaticWrapper.existFile(filePath)) fileUtilsStaticWrapper.deleteFile(filePath);
             }
         }catch (Exception e){
             //log fata error, this rollback must not fail
@@ -94,13 +96,13 @@ public class FIleUtilsImpl {
 
     public void deleteFiles (LinkedList<String> fileTORemove,String pathImage) throws IOException {
 
-        Path destinationDirectoryPath = Paths.get(pathImage);
+        Path destinationDirectoryPath = fileUtilsStaticWrapper.getPath(pathImage);
 
-        Files.createDirectories(destinationDirectoryPath);
+        fileUtilsStaticWrapper.createDirectories(destinationDirectoryPath);
 
-        Path tempDirectoryPath = Paths.get(tempPath).resolve(UUID.randomUUID().toString());
+        Path tempDirectoryPath = fileUtilsStaticWrapper.getPath(tempPath).resolve(fileUtilsStaticWrapper.getUUID().toString());
 
-        Files.createDirectories(tempDirectoryPath);
+        fileUtilsStaticWrapper.createDirectories(tempDirectoryPath);
 
         LinkedList<String> fileToBackup = new LinkedList<>();
 
@@ -109,7 +111,7 @@ public class FIleUtilsImpl {
             fileToBackup.add(imageName);
             Path backupPath = tempDirectoryPath.resolve(imageName);
             Path destinationToRemove = destinationDirectoryPath.resolve(imageName);
-            Files.move(destinationToRemove,backupPath,StandardCopyOption.ATOMIC_MOVE);
+            fileUtilsStaticWrapper.moveFile(destinationToRemove,backupPath);
         }
         }catch(Exception e){
             restoreBackup(tempDirectoryPath,destinationDirectoryPath,fileToBackup);
@@ -144,7 +146,7 @@ public class FIleUtilsImpl {
         for( String imageName : fileToRestore ) {
             Path backupPath = directoryBackup.resolve(imageName);
             Path destinationToRemove = directoryRestore.resolve(imageName);
-            Files.move(destinationToRemove,backupPath,StandardCopyOption.ATOMIC_MOVE);
+            fileUtilsStaticWrapper.moveFile(destinationToRemove,backupPath);
         }
        }catch (Exception e){
            log.error("errore fatale durante il rollback della cancellazione");

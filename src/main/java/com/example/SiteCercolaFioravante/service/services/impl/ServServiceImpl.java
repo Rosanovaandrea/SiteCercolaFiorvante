@@ -66,7 +66,7 @@ public class ServServiceImpl implements ServService {
         return service;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public boolean insertService(ServiceDtoCompleteUpload service, List<MultipartFile> imagesDto) {
 
