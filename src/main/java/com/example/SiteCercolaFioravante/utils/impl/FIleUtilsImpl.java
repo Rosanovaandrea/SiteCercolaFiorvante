@@ -72,7 +72,12 @@ public class FIleUtilsImpl {
             fileUtilsStaticWrapper.moveFile(sourcePath,destinationPath);
         }
         }catch (Exception e){
-            reverInsert(filesTORemove, destinationDirectoryPath);
+            log.error(e.getMessage()+"errore nell'inserimento dei file");
+            try {
+                reverInsert(filesTORemove, destinationDirectoryPath);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
             throw e;
 
         }finally {
@@ -81,7 +86,7 @@ public class FIleUtilsImpl {
 
     }
 
-    public void reverInsert(LinkedHashSet<String> deleterFiles,Path pathImage) throws IOException {
+    public void reverInsert(LinkedHashSet<String> deleterFiles,Path pathImage) throws Exception {
         try {
             for (String fileName : deleterFiles) {
                 Path filePath = pathImage.resolve(fileName);
@@ -89,8 +94,8 @@ public class FIleUtilsImpl {
             }
         }catch (Exception e){
             //log fata error, this rollback must not fail
-            log.error("errore fatale durante il rollback dell'inserimento");
-            throw new IOException("Rollback dell'inserimento fallito.", e);
+            log.error(e.getMessage()+"errore fatale durante il rollback dell'inserimento");
+            throw e;
         }
     }
 
@@ -113,9 +118,18 @@ public class FIleUtilsImpl {
             Path destinationToRemove = destinationDirectoryPath.resolve(imageName);
             fileUtilsStaticWrapper.moveFile(destinationToRemove,backupPath);
         }
-        }catch(Exception e){
-            restoreBackup(tempDirectoryPath,destinationDirectoryPath,fileToBackup);
+        }catch(IOException e){
+
+            log.error(e.getMessage()+"errore nella cancellazione");
+
+            try {
+                restoreBackup(tempDirectoryPath,destinationDirectoryPath,fileToBackup);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+
             throw e;
+
         }finally {
 
             cleanUpDirectory(tempDirectoryPath);
@@ -141,7 +155,7 @@ public class FIleUtilsImpl {
         }
     }
 
-    private void restoreBackup(Path directoryBackup ,Path directoryRestore,LinkedList<String> fileToRestore) throws IOException {
+    public void restoreBackup(Path directoryBackup ,Path directoryRestore,LinkedList<String> fileToRestore) throws Exception{
        try{
         for( String imageName : fileToRestore ) {
             Path backupPath = directoryBackup.resolve(imageName);
@@ -149,8 +163,8 @@ public class FIleUtilsImpl {
             fileUtilsStaticWrapper.moveFile(destinationToRemove,backupPath);
         }
        }catch (Exception e){
-           log.error("errore fatale durante il rollback della cancellazione");
-           throw new IOException("Rollback dell'inserimento fallito.", e);
+           log.error(e.getMessage()+"errore fatale durante il rollback della cancellazione");
+           throw e;
        }
     }
 
