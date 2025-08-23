@@ -81,7 +81,7 @@ public class FIleUtilsImpl {
 
     }
 
-    private void reverInsert(LinkedHashSet<String> deleterFiles,Path pathImage) throws IOException {
+    public void reverInsert(LinkedHashSet<String> deleterFiles,Path pathImage) throws IOException {
         try {
             for (String fileName : deleterFiles) {
                 Path filePath = pathImage.resolve(fileName);
@@ -125,7 +125,7 @@ public class FIleUtilsImpl {
 
     }
 
-    private void cleanUpDirectory(Path directory){
+    public void cleanUpDirectory(Path directory){
         if (Files.exists(directory)) {
             try (Stream<Path> pathStream = Files.walk(directory)) {
                 pathStream.sorted(Comparator.reverseOrder()).forEach(path -> {
