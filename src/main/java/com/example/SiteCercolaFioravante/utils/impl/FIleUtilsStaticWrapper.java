@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class FIleUtilsStaticWrapper {
@@ -38,5 +39,8 @@ public class FIleUtilsStaticWrapper {
 
     public void deleteFile(Path path) throws IOException {
         Files.delete(path);
+    }
+    public Stream<Path> walk(Path path) throws IOException {
+        return Files.walk(path);
     }
 }

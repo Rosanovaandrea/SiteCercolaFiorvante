@@ -6,14 +6,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 public class FIleUtilsUnitTest {
@@ -444,6 +445,216 @@ public class FIleUtilsUnitTest {
         Mockito.verify(fIleUtils,Mockito.times(1)).cleanUpDirectory(tmpPathUUID);
     }
 
+    @Test
+    void restoreBackupTest() throws Exception {
+        String tmpPath =  "./tmp";
+        String pathImage ="./pathImage";
+        UUID fixedUUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
+        Path imagePthPath = Paths.get(pathImage);
+        Path tmpPathUUID = Paths.get(tmpPath).resolve(fixedUUID.toString());
+        FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).moveFile(Mockito.any(),Mockito.any());
+
+
+        FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpPath,fIleUtilsStaticWrapper);
+
+        LinkedList<String> fileToRestore = new LinkedList<>();
+
+        fileToRestore.add("file.jpg");
+        fileToRestore.add("file1.jpd");
+
+
+        fIleUtils.restoreBackup(tmpPathUUID,imagePthPath,fileToRestore);
+
+        Mockito.verify(fIleUtilsStaticWrapper,Mockito.times(1)).moveFile(Mockito.eq(tmpPathUUID.resolve(fileToRestore.get(0))),Mockito.eq(imagePthPath.resolve(fileToRestore.get(0))));
+        Mockito.verify(fIleUtilsStaticWrapper,Mockito.times(1)).moveFile(Mockito.eq(tmpPathUUID.resolve(fileToRestore.get(1))),Mockito.eq(imagePthPath.resolve(fileToRestore.get(1))));
+
+    }
+
+    @Test
+    void restoreBackupExceptionTest() throws Exception {
+        String tmpPath =  "./tmp";
+        String pathImage ="./pathImage";
+        UUID fixedUUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
+        Path imagePthPath = Paths.get(pathImage);
+        Path tmpPathUUID = Paths.get(tmpPath).resolve(fixedUUID.toString());
+        FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+        Mockito.doThrow(IOException.class).when(fIleUtilsStaticWrapper).moveFile(Mockito.any(),Mockito.any());
+
+
+        FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpPath,fIleUtilsStaticWrapper);
+
+        LinkedList<String> fileToRestore = new LinkedList<>();
+
+        fileToRestore.add("file.jpg");
+        fileToRestore.add("file1.jpd");
+
+
+        Assertions.assertThrows(Exception.class,()->{fIleUtils.restoreBackup(tmpPathUUID,imagePthPath,fileToRestore);});
+
+        Mockito.verify(fIleUtilsStaticWrapper,Mockito.times(1)).moveFile(Mockito.eq(tmpPathUUID.resolve(fileToRestore.get(0))),Mockito.eq(imagePthPath.resolve(fileToRestore.get(0))));
+
+    }
+
+    @Test
+    void revertInsertRightTest() throws Exception {
+            FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+            String tmpString = "./tmp";
+            String pathImage ="./image";
+            LinkedHashSet<String> fileToRemove = new LinkedHashSet<>();
+
+            Mockito.when(fIleUtilsStaticWrapper.existFile(Mockito.any())).thenReturn(true);
+            Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(Mockito.any());
+
+            fileToRemove.add("image.jpg");
+            fileToRemove.add(("image1.jpg"));
+
+            Path imagePath = Paths.get(pathImage);
+
+            FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpString,fIleUtilsStaticWrapper);
+
+            fIleUtils.reverInsert(fileToRemove,imagePath);
+
+            Mockito.verify(fIleUtilsStaticWrapper, Mockito.times(2)).existFile(Mockito.any());
+
+            for(String image : fileToRemove){
+                Mockito.verify(fIleUtilsStaticWrapper,Mockito.times(1)).deleteFile(Mockito.eq(imagePath.resolve(image)));
+            }
+
+    }
+
+    @Test
+    void revertInsertWithFalseExistTest() throws Exception {
+        FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+        String tmpString = "./tmp";
+        String pathImage ="./image";
+        LinkedHashSet<String> fileToRemove = new LinkedHashSet<>();
+
+        Mockito.when(fIleUtilsStaticWrapper.existFile(Mockito.any())).thenReturn(true,false);
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(Mockito.any());
+
+        fileToRemove.add("image.jpg");
+        fileToRemove.add(("image1.jpg"));
+
+        Path imagePath = Paths.get(pathImage);
+
+        FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpString,fIleUtilsStaticWrapper);
+
+        fIleUtils.reverInsert(fileToRemove,imagePath);
+
+        Mockito.verify(fIleUtilsStaticWrapper, Mockito.times(2)).existFile(Mockito.any());
+
+        Mockito.verify(fIleUtilsStaticWrapper,Mockito.times(1)).deleteFile(Mockito.any());
+
+
+    }  @Test
+    void revertInserExceptionTest() throws Exception {
+        FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+        String tmpString = "./tmp";
+        String pathImage ="./image";
+        LinkedHashSet<String> fileToRemove = new LinkedHashSet<>();
+
+        Mockito.when(fIleUtilsStaticWrapper.existFile(Mockito.any())).thenReturn(true,false);
+        Mockito.doThrow(IOException.class).when(fIleUtilsStaticWrapper).deleteFile(Mockito.any());
+
+        fileToRemove.add("image.jpg");
+        fileToRemove.add(("image1.jpg"));
+
+        Path imagePath = Paths.get(pathImage);
+
+        FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpString,fIleUtilsStaticWrapper);
+
+        Assertions.assertThrows(Exception.class,()->{fIleUtils.reverInsert(fileToRemove,imagePath);});
+
+        Mockito.verify(fIleUtilsStaticWrapper, Mockito.times(1)).existFile(Mockito.any());
+
+        Mockito.verify(fIleUtilsStaticWrapper,Mockito.times(1)).deleteFile(Mockito.any());
+
+
+    }
+
+    @Test
+    void tryCleanUpTepDirectoryRightTest() throws IOException {
+
+        FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+        String tmpString = "./tmp";
+        Path directory = Paths.get(tmpString);
+        Path file1 = Paths.get("file1.jpg");
+        Path file2 = Paths.get("file2.jpg");
+        Path file3 = Paths.get("file3.jpg");
+
+        Mockito.when(fIleUtilsStaticWrapper.existFile(Mockito.any())).thenReturn(true);
+        Mockito.when(fIleUtilsStaticWrapper.walk(directory)).thenReturn(Stream.of(directory,file1,file2,file3));
+
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(file1);
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(file2);
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(file3);
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(directory);
+
+
+        FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpString,fIleUtilsStaticWrapper);
+
+        fIleUtils.cleanUpDirectory(directory);
+
+        InOrder inOrder = Mockito.inOrder(fIleUtilsStaticWrapper);
+
+       inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(file3));
+       inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(file2));
+        inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(file1));
+        inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(directory));
+
+    }
+
+    @Test
+    void tryCleanUpTempDirectoryNotThrowOnErrorOnWalkInizialization() throws IOException {
+
+        FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+        String tmpString = "./tmp";
+        Path directory = Paths.get(tmpString);
+
+        Mockito.when(fIleUtilsStaticWrapper.existFile(directory)).thenReturn(true);
+
+        Mockito.when(fIleUtilsStaticWrapper.walk(directory)).thenThrow(IOException.class);
+
+        FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpString,fIleUtilsStaticWrapper);
+
+        fIleUtils.cleanUpDirectory(directory);
+
+        Mockito.verify(fIleUtilsStaticWrapper,Mockito.times(0)).deleteFile(Mockito.any());
+    }
+
+    @Test
+    void tryCleanUpTempDirectoryNotThrowOnErrorOnWalk() throws IOException {
+
+        FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
+        String tmpString = "./tmp";
+        Path directory = Paths.get(tmpString);
+        Path file1 = Paths.get("file1.jpg");
+        Path file2 = Paths.get("file2.jpg");
+        Path file3 = Paths.get("file3.jpg");
+
+        Mockito.when(fIleUtilsStaticWrapper.existFile(Mockito.any())).thenReturn(true);
+        Mockito.when(fIleUtilsStaticWrapper.walk(directory)).thenReturn(Stream.of(directory,file1,file2,file3));
+
+        FIleUtilsImpl fIleUtils = new FIleUtilsImpl(tmpString,fIleUtilsStaticWrapper);
+
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(file1);
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(file2);
+        Mockito.doNothing().when(fIleUtilsStaticWrapper).deleteFile(file3);
+
+        Mockito.doThrow(IOException.class).when(fIleUtilsStaticWrapper).deleteFile(directory);
+
+        fIleUtils.cleanUpDirectory(directory);
+
+
+        InOrder inOrder = Mockito.inOrder(fIleUtilsStaticWrapper);
+
+        inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(file3));
+        inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(file2));
+        inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(file1));
+        inOrder.verify(fIleUtilsStaticWrapper).deleteFile(Mockito.eq(directory));
+
+    }
 
 
 }

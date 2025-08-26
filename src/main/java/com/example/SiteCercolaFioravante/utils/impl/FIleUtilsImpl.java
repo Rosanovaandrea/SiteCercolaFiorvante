@@ -90,7 +90,9 @@ public class FIleUtilsImpl {
         try {
             for (String fileName : deleterFiles) {
                 Path filePath = pathImage.resolve(fileName);
-                if (fileUtilsStaticWrapper.existFile(filePath)) fileUtilsStaticWrapper.deleteFile(filePath);
+                if (fileUtilsStaticWrapper.existFile(filePath)){
+                    fileUtilsStaticWrapper.deleteFile(filePath);
+                }
             }
         }catch (Exception e){
             //log fata error, this rollback must not fail
@@ -140,11 +142,11 @@ public class FIleUtilsImpl {
     }
 
     public void cleanUpDirectory(Path directory){
-        if (Files.exists(directory)) {
-            try (Stream<Path> pathStream = Files.walk(directory)) {
+        if (fileUtilsStaticWrapper.existFile(directory)) {
+            try (Stream<Path> pathStream = fileUtilsStaticWrapper.walk(directory)) {
                 pathStream.sorted(Comparator.reverseOrder()).forEach(path -> {
                     try {
-                        Files.delete(path);
+                        fileUtilsStaticWrapper.deleteFile(path);
                     } catch (IOException ex) {
                         log.warn("errore durante la cancellazione di un file temporaneo");
                     }
@@ -159,8 +161,8 @@ public class FIleUtilsImpl {
        try{
         for( String imageName : fileToRestore ) {
             Path backupPath = directoryBackup.resolve(imageName);
-            Path destinationToRemove = directoryRestore.resolve(imageName);
-            fileUtilsStaticWrapper.moveFile(destinationToRemove,backupPath);
+            Path destinationToRestore = directoryRestore.resolve(imageName);
+            fileUtilsStaticWrapper.moveFile(backupPath,destinationToRestore);
         }
        }catch (Exception e){
            log.error(e.getMessage()+"errore fatale durante il rollback della cancellazione");
