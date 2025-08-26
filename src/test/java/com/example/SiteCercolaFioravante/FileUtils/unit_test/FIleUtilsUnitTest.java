@@ -1,4 +1,4 @@
-package com.example.SiteCercolaFioravante.unit_test;
+package com.example.SiteCercolaFioravante.FileUtils.unit_test;
 
 import com.example.SiteCercolaFioravante.utils.impl.FIleUtilsImpl;
 import com.example.SiteCercolaFioravante.utils.impl.FIleUtilsStaticWrapper;
@@ -548,7 +548,7 @@ public class FIleUtilsUnitTest {
 
 
     }  @Test
-    void revertInserExceptionTest() throws Exception {
+    void revertInsertExceptionTest() throws Exception {
         FIleUtilsStaticWrapper fIleUtilsStaticWrapper = Mockito.mock();
         String tmpString = "./tmp";
         String pathImage ="./image";
