@@ -10,6 +10,7 @@ import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticatio
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,8 +28,10 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CustomerAuthenticationServiceImpl implements CustomerAuthenticationService {
 
+    private final AuthenticationStaticLibraryWrapper wrapper;
     private final JwtUtils jwtUtils;
     private final CustomerRepository repository;
     private final MapperCustomer mapper;
@@ -41,11 +44,13 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
         Customer customer = repository.findCustomerByEmail(email).orElse(null);
         if(customer!=null) {
-            String tokenId = UUID.randomUUID().toString();
-            String tokenString = jwtUtils.createRefreshOrPasswordResetToken(tokenId,Long.toString(customer.getId()), TokenType.RESET_PASSWORD);
+            String tokenId = wrapper.getUUID().toString();
+            String tokenString = jwtUtils.createResetPasswordToken(tokenId,Long.toString(customer.getId()));
             customer.setTokenRegistration(tokenId);
             repository.save(customer);
             sendMessageEmail(email, "reset Password", tokenString + " " + email);
+        }else{
+            log.warn("password reset not produced for not present customer");
         }
         return true;
     }
@@ -57,30 +62,28 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
         String[] info;
 
         try {
-            info = jwtUtils.getTokenRefreshOrPasswordResetInfo(token).split(" ");
 
+        info = jwtUtils.passwordResetJwtVerification(token);
 
+        }catch(JWTVerificationException e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Link non valido");
+        }
 
         Customer customer = repository.findById(Long.parseLong(info[0])).orElse(null);
 
         if(customer == null){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Utente non registrato");
         }
-        if(!customer.getTokenRegistration().equals(info[1]) || !info[2].equals(TokenType.RESET_PASSWORD.toString())){
+
+        if(customer.getTokenRegistration() == null || !customer.getTokenRegistration().equals(info[1])){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Link non valido");
         }
 
-
-        customer.setPassword(BCrypt.hashpw(password.getBytes(StandardCharsets.UTF_8), BCrypt.gensalt()));
+        customer.setPassword(wrapper.setPassword(password));
         customer.setTokenRegistration(null);
-
         repository.saveAndFlush(customer);
+
         return true;
-
-        }catch(JWTVerificationException e){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Link non valido");
-        }
-
 
     }
 
@@ -88,29 +91,33 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     public String[] doLogin(String email, String password) {
 
 
-        Optional<Customer> opt = repository.findCustomerByEmail(email);
+       Customer customer = repository.findCustomerByEmail(email).orElse(null);
 
-        if(opt.isEmpty())
+        if(customer == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password o email non valida");
 
 
-        String passwordFromDB = opt.get().getPassword();
+        String passwordFromDB = customer.getPassword();
 
-        if (BCrypt.checkpw(password, passwordFromDB)){
-
-            String idRegistrationToken = UUID.randomUUID().toString();
-
-            opt.get().setTokenRegistration(idRegistrationToken);
-            repository.saveAndFlush(opt.get());
-
-
-
-            return new String[] {jwtUtils.createRefreshOrPasswordResetToken(idRegistrationToken,Long.toString(opt.get().getId()),TokenType.REFRESH_TOKEN),
-                                jwtUtils.createAccessToken(Long.toString(opt.get().getId()),opt.get().getRole().toString())};
-
-            }
-        else
+        if (!wrapper.checkPassword(password, passwordFromDB)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"password o email non valida");
+        }
+
+
+            String idRegistrationToken = wrapper.getUUID().toString();
+
+            customer.setTokenRegistration(idRegistrationToken);
+            repository.saveAndFlush(customer);
+
+
+
+            return new String[] {
+                    jwtUtils.createRefreshToken(idRegistrationToken,Long.toString(customer.getId())),
+                    jwtUtils.createAccessToken(Long.toString(customer.getId()),customer.getRole().toString())
+            };
+
+
+
 
     }
 
@@ -121,7 +128,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             Customer customerDB = mapper.fromDtoCompleteToCustomer(customer);
             customerDB.setRole(CustomerRole.CUSTOMER);
 
-            String password = BCrypt.hashpw(customer.password(), BCrypt.gensalt());
+            String password = wrapper.setPassword(customer.password());
 
             customerDB.setPassword(password);
 
@@ -132,8 +139,10 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             repository.save(customerDB);
             repository.flush();
 
-        return new String[] {jwtUtils.createRefreshOrPasswordResetToken(idRegistrationToken,Long.toString(customerDB.getId()),TokenType.REFRESH_TOKEN),
-                jwtUtils.createAccessToken(Long.toString(customerDB.getId()),customerDB.getRole().toString())};
+        return new String[] {
+                jwtUtils.createRefreshToken(idRegistrationToken,Long.toString(customerDB.getId())),
+                jwtUtils.createAccessToken(Long.toString(customerDB.getId()),customerDB.getRole().toString())
+        };
 
     }
 
@@ -155,33 +164,24 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     @Override
     public String doRefreshAccessToken(String token) {
 
-        Customer customer = null;
         String[] info;
 
         try{
-        info = jwtUtils.getTokenRefreshOrPasswordResetInfo(token).split(" ");
-
-
-        customer = repository.findById(Long.parseLong(info[0])).orElse(null);
-
-        if(
-                customer == null ||
-                customer.getTokenRegistration() == null ||
-                !customer.getTokenRegistration().equals(info[1]) ||
-                !info[2].equals(TokenType.REFRESH_TOKEN.toString())
-        ) {
-
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"refresh token non valido");
-
-            }
-
-        return jwtUtils.createAccessToken(Long.toString(customer.getId()),customer.getRole().toString());
+            info = jwtUtils.refreshTokenVerification(token);
 
         }catch(JWTVerificationException e){
-            System.err.println(e.getMessage());
+            log.warn("si è provato a fare un accesso con token non valido");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "refresh token non valido");
-
         }
+
+        Customer customer = repository.findById(Long.parseLong(info[0])).orElse(null);
+
+        if( customer == null || customer.getTokenRegistration() == null || !customer.getTokenRegistration().equals( info[1] ) ) {
+            log.warn("si è provato a fare un accesso con token non memorizzato ");
+            throw new ResponseStatusException( HttpStatus.FORBIDDEN, "refresh token non valido" );
+        }
+
+        return jwtUtils.createAccessToken(  Long.toString( customer.getId() ),  customer.getRole().toString() );
 
     }
 

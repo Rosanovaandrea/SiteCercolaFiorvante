@@ -49,6 +49,29 @@ public class JwtUtils {
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
+    public String createResetPasswordToken(String tokenId , String subjectId) {
+
+        return createLongLiveToken(tokenId,subjectId,TokenType.RESET_PASSWORD,5);
+    }
+
+    public String createRefreshToken(String tokenId , String subjectId) {
+
+        return createLongLiveToken(tokenId,subjectId,TokenType.REFRESH_TOKEN,1);
+    }
+
+    public String createLongLiveToken(String tokenId , String id, TokenType type,int validity) {
+        LocalDateTime now = LocalDateTime.now() ;
+
+        ZoneId zoneId = ZoneId.of(TIME_ZONE);
+        ZonedDateTime nowZone = ZonedDateTime.of(now,zoneId);
+        ZonedDateTime validityZone = ZonedDateTime.of(now.plusHours(validity),zoneId);
+
+        return JWT.create().withSubject(id).withIssuer(issuer).withClaim(TOKEN_REFRESH_ID,tokenId).withClaim(TOKEN_TYPE,type.toString())
+                .withIssuedAt(Instant.from(nowZone))
+                .withExpiresAt(Instant.from(validityZone))
+                .sign(Algorithm.HMAC256(secretKey));
+    }
+
     public String createAccessToken(String login,String role) {
         LocalDateTime now = LocalDateTime.now() ;
 
@@ -67,6 +90,20 @@ public class JwtUtils {
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey)).withIssuer(issuer).build();
         DecodedJWT decoded = verifier.verify(token);
         return decoded.getSubject()+" "+decoded.getClaim(TOKEN_REFRESH_ID).asString()+" "+decoded.getClaim(TOKEN_TYPE).asString();
+    }
+
+    public String[] passwordResetJwtVerification(String token){
+
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey)).withIssuer(issuer).withClaim(TOKEN_TYPE,TokenType.RESET_PASSWORD.toString()).build();
+        DecodedJWT decoded = verifier.verify(token);
+        return new String[]{decoded.getSubject(),decoded.getClaim(TOKEN_REFRESH_ID).asString()};
+    }
+
+    public String[] refreshTokenVerification(String token){
+
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey)).withIssuer(issuer).withClaim(TOKEN_TYPE,TokenType.REFRESH_TOKEN.toString()).build();
+        DecodedJWT decoded = verifier.verify(token);
+        return new String[] {decoded.getSubject(),decoded.getClaim(TOKEN_REFRESH_ID).asString()};
     }
 
 
