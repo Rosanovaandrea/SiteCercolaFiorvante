@@ -28,7 +28,7 @@ public class FIleUtilsImpl implements FileUtils {
         this.fileUtilsStaticWrapper = fileUtilsStaticWrapper;
     }
 
-    public HashSet<String> getImageNames(@org.jetbrains.annotations.NotNull List<MultipartFile> imagesToSave){
+    public LinkedHashSet<String> getImageNames(@org.jetbrains.annotations.NotNull List<MultipartFile> imagesToSave){
 
         LinkedHashSet<String> images = new LinkedHashSet<>();
         for( int i = 0; i < imagesToSave.size(); i++ ) {
