@@ -1,24 +1,29 @@
 package com.example.SiteCercolaFioravante.utils.impl;
 
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-@Service
+@Component
 public class FIleUtilsStaticWrapper {
+
+    private final FileSystem fileSystem;
+
+    public FIleUtilsStaticWrapper(@Autowired FileSystem fileSystem){
+        this.fileSystem = fileSystem;
+    }
+
     public UUID getUUID(){
         return UUID.randomUUID();
     }
 
     public Path getPath(String path){
-       return Paths.get(path);
+       return fileSystem.getPath(path);
     }
 
     public void createDirectories(Path path) throws IOException {

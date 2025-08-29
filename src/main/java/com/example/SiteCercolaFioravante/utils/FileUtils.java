@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 
 public interface FileUtils {
 
+    LinkedHashSet<String> getImageNames(@org.jetbrains.annotations.NotNull List<MultipartFile> imagesToSave);
+
     void transferToFile(LinkedHashSet<String> imageNames, List<MultipartFile> imagesToSave, String pathImage) throws IOException;
 
     void reverInsert(LinkedHashSet<String> deleterFiles,Path pathImage) throws Exception;
