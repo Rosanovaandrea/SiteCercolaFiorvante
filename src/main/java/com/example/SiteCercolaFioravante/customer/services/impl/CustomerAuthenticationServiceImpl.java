@@ -1,7 +1,6 @@
 package com.example.SiteCercolaFioravante.customer.services.impl;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.example.SiteCercolaFioravante.TokenType;
 import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
@@ -17,12 +16,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
