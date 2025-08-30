@@ -44,7 +44,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             String tokenId = wrapper.getUUID().toString();
             String tokenString = jwtUtils.createResetPasswordToken(tokenId,Long.toString(customer.getId()));
             customer.setTokenRegistration(tokenId);
-            repository.save(customer);
+            repository.saveAndFlush(customer);
             sendMessageEmail(email, "reset Password", tokenString + " " + email);
         }else{
             log.warn("password reset not produced for not present customer");
@@ -129,7 +129,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
             customerDB.setPassword(password);
 
-            String idRegistrationToken = UUID.randomUUID().toString();
+            String idRegistrationToken = wrapper.getUUID().toString();
 
             customerDB.setTokenRegistration(idRegistrationToken);
 
@@ -143,7 +143,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
     }
 
-    private void sendMessageEmail(String to,String subject,String text){
+    public void sendMessageEmail(String to,String subject,String text){
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setFrom("ardemusfrizzo@gmail.com");
