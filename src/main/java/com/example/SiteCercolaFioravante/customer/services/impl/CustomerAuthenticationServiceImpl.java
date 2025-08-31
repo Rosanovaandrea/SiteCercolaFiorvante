@@ -45,7 +45,8 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             String tokenString = jwtUtils.createResetPasswordToken(tokenId,Long.toString(customer.getId()));
             customer.setTokenRegistration(tokenId);
             repository.saveAndFlush(customer);
-            sendMessageEmail(email, "reset Password", tokenString + " " + email);
+            String subject ="reset Password";
+            sendMessageEmail(email, subject, tokenString + " " + email);
         }else{
             log.warn("password reset not produced for not present customer");
         }
@@ -85,6 +86,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     }
 
     @Override
+    @Transactional
     public String[] doLogin(String email, String password) {
 
 
