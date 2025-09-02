@@ -115,9 +115,6 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
                     jwtUtils.createAccessToken(Long.toString(customer.getId()),customer.getRole().toString())
             };
 
-
-
-
     }
 
     @Override
