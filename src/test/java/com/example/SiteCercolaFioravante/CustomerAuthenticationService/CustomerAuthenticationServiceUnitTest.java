@@ -265,4 +265,82 @@ public class CustomerAuthenticationServiceUnitTest {
         Mockito.verify(repository).findCustomerByEmail(email);
     }
 
+    @Test
+    void doRefreshAccessToken_ValidTokenAndCustomerExists() {
+
+        // Scenario: Token valido, customer esistente
+        Long customerId = 1L;
+        String refreshToken = "validRefreshToken";
+        String tokenId = "token_id";
+        String role = "CUSTOMER";
+
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setTokenRegistration(tokenId);
+        customer.setRole(com.example.SiteCercolaFioravante.customer.CustomerRole.CUSTOMER);
+
+        Mockito.when(jwtUtils.refreshTokenVerification(refreshToken)).thenReturn(new String[]{Long.toString(customerId),tokenId});
+
+        Mockito.when(repository.findById(customerId)).thenReturn(Optional.of(customer));
+        Mockito.when(jwtUtils.createAccessToken(customerId.toString(), role)).thenReturn("newAccessToken");
+
+        String accessToken = service.doRefreshAccessToken(refreshToken);
+
+        Assertions.assertEquals("newAccessToken", accessToken);
+        Mockito.verify(repository).findById(customerId);
+        Mockito.verify(jwtUtils).createAccessToken(customerId.toString(), role);
+    }
+
+    @Test
+    void doRefreshAccessToken_InvalidTokenVerificationException() {
+        // Scenario: Token non valido (JWTVerificationException)
+        String invalidToken = "invalidRefreshToken";
+
+        Mockito.when(jwtUtils.refreshTokenVerification(invalidToken)).thenThrow(new JWTVerificationException("token is invalid"));
+
+        Assertions.assertThrows(ResponseStatusException.class, () -> service.doRefreshAccessToken(invalidToken)); // Verifica che venga lanciata l'eccezione corretta
+        Mockito.verify(repository, Mockito.never()).findById(Mockito.anyLong());
+        Mockito.verify(jwtUtils).refreshTokenVerification(invalidToken);
+    }
+
+    @Test
+    void doRefreshAccessToken_CustomerNotFound() {
+        // Scenario: Customer non trovato nel database
+        String refreshToken = "validRefreshToken";
+        String validTokenId = "valid_token_id";
+        Long customerId = 123L;
+
+        Mockito.when(jwtUtils.refreshTokenVerification(refreshToken)).thenReturn(new String[]{Long.toString(customerId),validTokenId});
+
+        Mockito.when(repository.findById(customerId)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResponseStatusException.class, () -> service.doRefreshAccessToken(refreshToken)); // Verifica che venga lanciata l'eccezione corretta
+        Mockito.verify(repository).findById(customerId);
+        Mockito.verify(jwtUtils, Mockito.never()).createAccessToken(Mockito.anyString(), Mockito.anyString());
+    }
+
+    @Test
+    void doRefreshAccessToken_TokenRegistrationMismatch() {
+        // Scenario: Token di registrazione non corrisponde
+        Long customerId = 1L;
+        String refreshToken = "validRefreshToken";
+        String validTokenId = "valid_token_id";
+        String oldTokenId = "old_token_id";
+        String role = "CUSTOMER";
+
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setTokenRegistration(validTokenId);
+        customer.setRole(com.example.SiteCercolaFioravante.customer.CustomerRole.CUSTOMER);
+
+
+        Mockito.when(repository.findById(customerId)).thenReturn(Optional.of(customer));
+        Mockito.when(jwtUtils.refreshTokenVerification(refreshToken)).thenReturn(new String[]{Long.toString(customerId),oldTokenId});
+
+        Assertions.assertThrows(ResponseStatusException.class, () -> service.doRefreshAccessToken(refreshToken)); // Verifica che venga lanciata l'eccezione corretta
+    }
+
+
+
+
 }
