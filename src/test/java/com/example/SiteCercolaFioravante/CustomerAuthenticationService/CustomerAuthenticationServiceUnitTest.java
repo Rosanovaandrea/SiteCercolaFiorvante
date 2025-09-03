@@ -15,8 +15,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -263,6 +267,30 @@ public class CustomerAuthenticationServiceUnitTest {
         Assertions.assertThrows(RuntimeException.class,()->{service.doLogin(email, password);});
 
         Mockito.verify(repository).findCustomerByEmail(email);
+    }
+
+    @Test
+    void testDoAuthentication() {
+
+        String[] expectedInfo = {"user1", "ROLE_USER"};
+        Mockito.when(jwtUtils.getTokenAccessId("testToken")).thenReturn(expectedInfo);
+
+        Authentication auth = service.doAuthentication("testToken");
+
+
+        Assertions.assertEquals("user1", auth.getName());
+
+
+        Assertions.assertEquals("testToken", auth.getCredentials());
+
+
+        Assertions.assertTrue(auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER")));
+    }
+
+    @Test
+    void testDoAuthenticationThrowsException() {
+        Mockito.when(jwtUtils.getTokenAccessId(Mockito.anyString())).thenThrow(JWTVerificationException.class);
+        Assertions.assertThrows(JWTVerificationException.class, () -> service.doAuthentication("testToken"));
     }
 
 }
