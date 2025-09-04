@@ -368,7 +368,73 @@ public class CustomerAuthenticationServiceUnitTest {
         Assertions.assertThrows(ResponseStatusException.class, () -> service.doRefreshAccessToken(refreshToken)); // Verifica che venga lanciata l'eccezione corretta
     }
 
+    @Test
+    void doLogout_happyPath() throws Exception {
+        Long customerId =1L;
+        String refreshTokenID ="refresh_token_id";
+        String refreshToken = "refresh_token";
 
+        // Arrange
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setTokenRegistration(refreshTokenID);
+        Mockito.when(repository.findById(customerId)).thenReturn(java.util.Optional.of(customer));
+        Mockito.when(jwtUtils.refreshTokenVerification(Mockito.anyString())).thenReturn(new String[]{Long.toString(customerId), refreshTokenID});
+
+        // Act
+        boolean result = service.doLogout(refreshToken);
+
+        // Assert
+        Assertions.assertTrue(result);
+        Mockito.verify(repository, Mockito.times(1)).save(customer);
+        Mockito.verify(jwtUtils, Mockito.times(1)).refreshTokenVerification(Mockito.anyString());
+    }
+
+    @Test
+    void doLogout_refreshTokenInvalid() throws Exception {
+        // Arrange
+        Long customerId =1L;
+        String refreshToken ="refresh_token";
+        Mockito.when(jwtUtils.refreshTokenVerification(Mockito.anyString())).thenThrow(new JWTVerificationException("Invalid token"));
+
+        // Act & Assert
+        ResponseStatusException e = Assertions.assertThrows(ResponseStatusException.class, () -> service.doLogout(refreshToken));
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED,e.getStatusCode());
+    }
+
+    @Test
+    void doLogout_customerNotFound() throws Exception {
+        Long customerId =1L;
+        String refreshToken ="refresh_token";
+        String refreshTokenID = "refresh_token_id";
+        Mockito.when(repository.findById(customerId)).thenReturn(Optional.empty());
+        Mockito.when(jwtUtils.refreshTokenVerification(Mockito.anyString())).thenReturn(new String[]{Long.toString(customerId), refreshTokenID});
+
+        // Act & Assert
+        ResponseStatusException e = Assertions.assertThrows(ResponseStatusException.class, () -> service.doLogout(refreshToken));
+        Assertions.assertEquals(HttpStatus.FORBIDDEN,e.getStatusCode());
+    }
+
+    @Test
+    void doLogout_tokenMismatch() throws Exception {
+        Long customerId = 1L;
+        String refreshToken = "refresh_token";
+        String refreshTokenId = "refresh_token_id";
+        String wrongTokenId = "wrong_token_id";
+        // Arrange
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setTokenRegistration(refreshTokenId);
+
+        Mockito.when(repository.findById(customerId)).thenReturn(java.util.Optional.of(customer));
+        Mockito.when(jwtUtils.refreshTokenVerification(Mockito.anyString())).thenReturn(new String[]{Long.toString(customerId), wrongTokenId});
+
+
+        // Act & Assert
+        ResponseStatusException e = Assertions.assertThrows(ResponseStatusException.class, () -> service.doLogout(refreshToken));
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN,e.getStatusCode());
+    }
 
 
 }

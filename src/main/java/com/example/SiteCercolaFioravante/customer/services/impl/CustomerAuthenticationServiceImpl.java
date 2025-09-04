@@ -190,4 +190,29 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
         authorities.add(new SimpleGrantedAuthority(info[1]));
         return new UsernamePasswordAuthenticationToken(info[0],token, authorities);
     }
+
+    @Transactional
+    @Override
+    public boolean doLogout(String refreshToken){
+        String[] info;
+        try {
+            info = jwtUtils.refreshTokenVerification(refreshToken);
+        }catch (JWTVerificationException e){
+            log.warn("logout tentato con token invalido"+e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"token non valido");
+        }
+
+        Customer customer = repository.findById(Long.parseLong(info[0])).orElse(null);
+
+        if( customer == null || customer.getTokenRegistration() == null || !customer.getTokenRegistration().equals( info[1] ) ) {
+            log.warn("si è provato a fare un logout con token non memorizzato ");
+            throw new ResponseStatusException( HttpStatus.FORBIDDEN, "refresh token non valido" );
+        }
+
+        customer.setTokenRegistration(null);
+
+        repository.save(customer);
+
+        return true;
+    }
 }

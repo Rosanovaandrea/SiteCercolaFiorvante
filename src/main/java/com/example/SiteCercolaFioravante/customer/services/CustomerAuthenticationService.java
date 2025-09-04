@@ -19,4 +19,6 @@ public interface CustomerAuthenticationService {
 
     Authentication doAuthentication(String token);
 
+    boolean doLogout(String refreshToken);
+
 }
