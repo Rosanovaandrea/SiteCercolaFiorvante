@@ -18,7 +18,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     List<CustomerDtoListProjection> getCustomerByNameOrSurname( String query );
 
-    Optional<Customer> findCustomerByEmail( String email );
+    @Query("SELECT c FROM Customer c JOIN FETCH c.credentials WHERE c.credentials.email = :email")
+    Optional<Customer> findCustomerByEmail(@Param("email") String email );
 
     Optional<Customer> findCustomerByRole( CustomerRole role );
 

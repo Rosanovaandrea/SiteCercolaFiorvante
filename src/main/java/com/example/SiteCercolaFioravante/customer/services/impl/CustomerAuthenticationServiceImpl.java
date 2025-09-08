@@ -77,7 +77,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Link non valido");
         }
 
-        customer.setPassword(wrapper.setPassword(password));
+        customer.getCredentials().setPassword(wrapper.setPassword(password));
         customer.setTokenRegistration(null);
         repository.saveAndFlush(customer);
 
@@ -96,7 +96,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password o email non valida");
 
 
-        String passwordFromDB = customer.getPassword();
+        String passwordFromDB = customer.getCredentials().getPassword();
 
         if (!wrapper.checkPassword(password, passwordFromDB)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"password o email non valida");
@@ -126,7 +126,7 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
 
             String password = wrapper.setPassword(customer.password());
 
-            customerDB.setPassword(password);
+            customerDB.getCredentials().setPassword(password);
 
             String idRegistrationToken = wrapper.getUUID().toString();
 

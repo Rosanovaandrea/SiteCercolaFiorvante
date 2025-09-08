@@ -37,8 +37,6 @@ public class CustomerServiceTest {
         customer = new Customer();
         customer.setName("carla");
         customer.setSurname("esposito");
-        customer.setEmail("carlaesposito@email.com");
-        customer.setPassword(BCrypt.hashpw("123456", BCrypt.gensalt()));
         customer.setPhoneNumber("3462842080");
         customer.setRole(CustomerRole.ADMIN);
 

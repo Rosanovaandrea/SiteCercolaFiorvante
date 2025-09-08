@@ -60,10 +60,8 @@ public class ReservationRepositoryTest {
         service.setDescription("massaggio antani");
 
         testCustomer = new Customer();
-        testCustomer.setEmail("ardemus@gnail.com");
         testCustomer.setName("andres");
         testCustomer.setSurname("rosanova");
-        testCustomer.setPassword("cheeks");
         testCustomer.setRole(CustomerRole.ADMIN);
         testCustomer.setPhoneNumber("3333333333");
 
@@ -88,7 +86,6 @@ public class ReservationRepositoryTest {
 
         day=dayRepository.getSingleDayDB(day.getDate());
         service= serviceRepository.getServiceDbByName(service.getServiceName());
-        testCustomer=customerRepository.findCustomerByEmail(testCustomer.getEmail()).orElse(null);
 
 
         List<Reservation> reservations = new LinkedList<Reservation>();

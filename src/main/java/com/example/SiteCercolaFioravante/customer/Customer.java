@@ -30,11 +30,9 @@ public class Customer {
     private String name;
 
 
-    private String password;
-
-    @Email
-    @Column(unique = true)
-    private String email;
+    @OneToOne(mappedBy = "customer") // Relazione definita in Customer
+    @JoinColumns({@JoinColumn(name = "credentials_id")})
+    private Credentials credentials;
 
     @NotNull
     @Column( nullable = false )

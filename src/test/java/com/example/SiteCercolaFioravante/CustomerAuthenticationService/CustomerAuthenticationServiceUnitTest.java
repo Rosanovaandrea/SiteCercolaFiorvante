@@ -1,6 +1,7 @@
 package com.example.SiteCercolaFioravante.CustomerAuthenticationService;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.example.SiteCercolaFioravante.customer.Credentials;
 import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
@@ -51,7 +52,6 @@ public class CustomerAuthenticationServiceUnitTest {
 
         Customer customer = Mockito.spy(new Customer());
         Mockito.doNothing().when(customer).setTokenRegistration(Mockito.any());
-
         Mockito.when(customer.getId()).thenReturn(1L);
         UUID mockUuid = UUID.fromString("68307970-bb6a-44df-8566-8c51de0089ce");
 
@@ -108,13 +108,16 @@ public class CustomerAuthenticationServiceUnitTest {
 
         Customer customer = new Customer();
         customer.setTokenRegistration(mockUuid.toString());
+        Credentials credentials = new Credentials();
+        customer.setCredentials(credentials);
+
         Mockito.when(jwtUtils.passwordResetJwtVerification(token)).thenReturn(info);
         Mockito.when(wrapper.setPassword(password)).thenReturn(password);
         Mockito.when(repository.findById(Mockito.anyLong())).thenReturn(Optional.of(customer));
         Mockito.when(repository.saveAndFlush(Mockito.any())).thenReturn(null);
         service.doPasswordReset(token,password);
 
-        Assertions.assertEquals(password,customer.getPassword());
+        Assertions.assertEquals(password,credentials.getPassword());
         Assertions.assertNull(customer.getTokenRegistration());
 
         Mockito.verify(jwtUtils,Mockito.times(1)).passwordResetJwtVerification(Mockito.eq(token));
@@ -173,6 +176,8 @@ public class CustomerAuthenticationServiceUnitTest {
         String[] info  = {Long.toString(1L),wrongUuid.toString()};
 
         Customer customer = new Customer();
+        Credentials credentials = new Credentials();
+        customer.setCredentials(credentials);
         customer.setTokenRegistration(mockUuid.toString());
         Mockito.when(jwtUtils.passwordResetJwtVerification(token)).thenReturn(info);
         Mockito.when(repository.findById(Mockito.anyLong())).thenReturn(Optional.of(customer));
@@ -181,7 +186,7 @@ public class CustomerAuthenticationServiceUnitTest {
 
         Assertions.assertEquals(HttpStatus.FORBIDDEN,e.getStatusCode());
 
-        Assertions.assertNull(customer.getPassword());
+        Assertions.assertNull(credentials.getPassword());
         Assertions.assertNotNull(customer.getTokenRegistration());
 
         Mockito.verify(jwtUtils,Mockito.times(1)).passwordResetJwtVerification(Mockito.eq(token));
@@ -198,11 +203,15 @@ public class CustomerAuthenticationServiceUnitTest {
 
         Customer customer = Mockito.spy(new Customer());
         Mockito.when(repository.findCustomerByEmail(email)).thenReturn(Optional.of(customer));
-        customer.setRole(com.example.SiteCercolaFioravante.customer.CustomerRole.CUSTOMER); // Set the role
+        customer.setRole(com.example.SiteCercolaFioravante.customer.CustomerRole.CUSTOMER);
+        Credentials credentials = new Credentials();
+        credentials.setPassword(password);
+        customer.setCredentials(credentials);
+
         UUID mockUuid = UUID.fromString("68307970-bb6a-44df-8566-8c51de0089ce");
 
         Mockito.when(wrapper.getUUID()).thenReturn(mockUuid);
-        Mockito.when(wrapper.checkPassword(Mockito.any(),Mockito.any())).thenReturn(true);
+        Mockito.when(wrapper.checkPassword(credentials.getPassword(),password)).thenReturn(true);
         Mockito.when(jwtUtils.createRefreshToken(Mockito.anyString(),Mockito.anyString())).thenReturn("refresh_token");
         Mockito.when(jwtUtils.createAccessToken(Mockito.anyString(),Mockito.anyString())).thenReturn("access_token");
 
@@ -240,18 +249,22 @@ public class CustomerAuthenticationServiceUnitTest {
     void doLoginInvalidPasswordTest(){
         String email ="test@example.com";
         String password ="wrongpassword";
+        String rightPassword ="right_password";
 
         Customer customer = Mockito.spy(new Customer());
         Mockito.when(repository.findCustomerByEmail(email)).thenReturn(Optional.of(customer));
         customer.setRole(com.example.SiteCercolaFioravante.customer.CustomerRole.CUSTOMER);
+        Credentials credentials = new Credentials();
+        credentials.setPassword(rightPassword);
+        customer.setCredentials(credentials);
 
 
-        Mockito.when(wrapper.checkPassword(password, customer.getPassword())).thenReturn(false);
+        Mockito.when(wrapper.checkPassword(password, credentials.getPassword())).thenReturn(false);
         ResponseStatusException e = Assertions.assertThrows(ResponseStatusException.class,()->{service.doLogin(email, password);});
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED,e.getStatusCode());
         Mockito.verify(repository).findCustomerByEmail(email);
-        Mockito.verify(wrapper).checkPassword(password, customer.getPassword());
+        Mockito.verify(wrapper).checkPassword(password, credentials.getPassword());
         Mockito.verify(jwtUtils, Mockito.never()).createRefreshToken(Mockito.anyString(), Mockito.anyString());
         Mockito.verify(jwtUtils, Mockito.never()).createAccessToken(Mockito.anyString(),Mockito.anyString());
 

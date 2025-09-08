@@ -1,5 +1,6 @@
 package com.example.SiteCercolaFioravante.startup;
 
+import com.example.SiteCercolaFioravante.customer.Credentials;
 import com.example.SiteCercolaFioravante.customer.Customer;
 import com.example.SiteCercolaFioravante.customer.CustomerRole;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
@@ -41,8 +42,10 @@ public class InitializeAdmin {
             Customer customer = new Customer();
             customer.setName(name);
             customer.setSurname(surname);
-            customer.setEmail(email);
-            customer.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+            Credentials credentials = new Credentials();
+            credentials.setEmail(email);
+            credentials.setPassword(BCrypt.hashpw(password,BCrypt.gensalt()));
+            customer.setCredentials(credentials);
             customer.setPhoneNumber(number);
             customer.setRole(CustomerRole.ADMIN);
 

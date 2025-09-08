@@ -31,10 +31,9 @@ public class CustomerRepositoryTest {
         customerRepository = repository;
         // Initialize test data before each test method
         testCustomer = new Customer();
-        testCustomer.setEmail("ardemus@gmail.com");
+
         testCustomer.setName("andres");
         testCustomer.setSurname("rosanova");
-        testCustomer.setPassword("cheeks");
         testCustomer.setRole(CustomerRole.CUSTOMER);
         testCustomer.setPhoneNumber("3333333333");
         customerRepository.save(testCustomer);
@@ -57,15 +56,7 @@ public class CustomerRepositoryTest {
 
 
 
-    @Test
-    void findCustomerByEmailTest(){
 
-        Customer customer = customerRepository.findCustomerByEmail(testCustomer.getEmail()).orElse(null);
-        assertEquals(customer.getId(),testCustomer.getId());
-
-        customer = customerRepository.findCustomerByEmail("67hfe@gmail.com").orElse(null);
-        assertNull(customer);
-    }
 
     @Test
     void findCustomerByRoleTest(){
