@@ -34,6 +34,10 @@ public class Service {
     @Size( max = 4 )
     private Set<String> images;
 
+    @Version
+    @ColumnDefault("0")
+    private long version;
+
     private String firstImage;
 
     @Column(nullable = false)

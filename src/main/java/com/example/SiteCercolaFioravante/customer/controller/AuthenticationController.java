@@ -69,13 +69,6 @@ public class AuthenticationController {
         return new ResponseEntity<>( tokens[1], HttpStatus.OK );
     }
 
-    @PostMapping( value = { "/registration" } )
-    public ResponseEntity<String> doRegistration( @Valid @RequestBody CustomerDtoComplete customer, HttpServletResponse response) {
-        String [] tokens = service.doRegistration(customer);
-        addAuthCookies(response,tokens[0]);
-        return new ResponseEntity<>( tokens[1] , HttpStatus.OK );
-    }
-
     @PostMapping( value = { "/refreshToken" } )
     public ResponseEntity<String> doRefreshToken(HttpServletRequest httpServletRequest) {
 

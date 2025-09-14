@@ -1,4 +1,4 @@
-package com.example.SiteCercolaFioravante;
+package com.example.SiteCercolaFioravante.customer;
 
 public enum TokenType {
     RESET_PASSWORD,

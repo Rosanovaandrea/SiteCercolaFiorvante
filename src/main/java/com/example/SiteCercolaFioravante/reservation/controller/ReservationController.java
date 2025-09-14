@@ -47,8 +47,8 @@ public class ReservationController {
         }
 
         @GetMapping("/customerRes")
-        public ResponseEntity<List<ReservationDto>> getCustomerReservation(@RequestParam String email){
-            return new ResponseEntity<>(reservationService.findReservationByUserEmail(email),HttpStatus.OK);
+        public ResponseEntity<List<ReservationDto>> getCustomerReservation(@RequestParam Long id){
+            return new ResponseEntity<>(reservationService.findReservationByUserEmail(id),HttpStatus.OK);
         }
 
         @DeleteMapping("/{id}")

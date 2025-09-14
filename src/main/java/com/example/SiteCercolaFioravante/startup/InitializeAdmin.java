@@ -25,7 +25,7 @@ public class InitializeAdmin {
     public InitializeAdmin(@Autowired CustomerRepository repository,
                            @Value("${admin.name}") String name,
                            @Value("${admin.surname}")String surname,
-                           @Value("${admin.email}")String email,
+                           @Value("${admin.customerId}")String email,
                            @Value("${admin.password}")String password,
                            @Value("${admin.number}")String number) {
         this.repository = repository;

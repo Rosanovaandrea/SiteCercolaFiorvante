@@ -93,13 +93,13 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
        Customer customer = repository.findCustomerByEmail(email).orElse(null);
 
         if(customer == null)
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password o email non valida");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password o customerId non valida");
 
 
         String passwordFromDB = customer.getCredentials().getPassword();
 
         if (!wrapper.checkPassword(password, passwordFromDB)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"password o email non valida");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"password o customerId non valida");
         }
 
 
@@ -114,31 +114,6 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
                     jwtUtils.createRefreshToken(idRegistrationToken,Long.toString(customer.getId())),
                     jwtUtils.createAccessToken(Long.toString(customer.getId()),customer.getRole().toString())
             };
-
-    }
-
-    @Override
-    @Transactional
-    public String[] doRegistration(CustomerDtoComplete customer) {
-
-            Customer customerDB = mapper.fromDtoCompleteToCustomer(customer);
-            customerDB.setRole(CustomerRole.CUSTOMER);
-
-            String password = wrapper.setPassword(customer.password());
-
-            customerDB.getCredentials().setPassword(password);
-
-            String idRegistrationToken = wrapper.getUUID().toString();
-
-            customerDB.setTokenRegistration(idRegistrationToken);
-
-            repository.save(customerDB);
-            repository.flush();
-
-        return new String[] {
-                jwtUtils.createRefreshToken(idRegistrationToken,Long.toString(customerDB.getId())),
-                jwtUtils.createAccessToken(Long.toString(customerDB.getId()),customerDB.getRole().toString())
-        };
 
     }
 

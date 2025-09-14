@@ -32,7 +32,7 @@ public class EmailSenderTest {
 
             helper.setFrom("ardemusfrizzo@gmail.com");
             helper.setTo("rosanovaandrea82@gmail.com");
-            helper.setSubject("email di prova");
+            helper.setSubject("customerId di prova");
             helper.setText("ciao");
 
             javaMailSender.send(message);

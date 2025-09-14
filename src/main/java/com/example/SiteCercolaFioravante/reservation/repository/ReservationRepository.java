@@ -26,8 +26,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "JOIN e.service serv  " +
             "JOIN e.customer  ctm " +
             "JOIN e.day day " +
-            "WHERE ctm.email = :email ")
-    List<ReservationDto> findReservationsByUserEmail(@Param( "email" ) String email );
+            "WHERE ctm.id = :id ")
+    List<ReservationDto> findReservationsByUserEmail(@Param( "id" ) Long id );
 
     @Query("SELECT new com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto" +
             "(e.id, day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +

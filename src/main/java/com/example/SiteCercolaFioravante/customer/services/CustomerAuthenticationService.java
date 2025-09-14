@@ -13,8 +13,6 @@ public interface CustomerAuthenticationService {
 
     String[] doLogin(String email, String password);
 
-    String[] doRegistration(CustomerDtoComplete customer);
-
     String doRefreshAccessToken(String token);
 
     Authentication doAuthentication(String token);

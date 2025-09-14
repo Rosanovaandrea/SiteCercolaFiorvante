@@ -31,7 +31,7 @@ public class ReservationServiceImpl implements ReservationService {
     public boolean insertReservation(ReservationDtoInsert reservation) {
         Reservation reservationDB = new Reservation();
         reservationDB.setService(servService.getServiceForReservation(reservation.serviceName()));
-        reservationDB.setCustomer(customerService.getCustomerFromEmailReservation(reservation.email()));
+        reservationDB.setCustomer(customerService.getCustomerById(reservation.customerId()));
         reservationDB.setCompleted(false);
         reservationDB.setDeletable(false);
         reservationDB.setHour(reservation.hour());
@@ -40,7 +40,6 @@ public class ReservationServiceImpl implements ReservationService {
         repository.saveAndFlush(reservationDB);
 
         servService.insertReservationInService(reservationDB);
-        customerService.inserReservationCustomer(reservationDB);
         dayService.insertReservationInDay(reservationDB);
 
         return true;
@@ -48,8 +47,8 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<ReservationDto> findReservationByUserEmail(String email) {
-        return repository.findReservationsByUserEmail(email);
+    public List<ReservationDto> findReservationByUserEmail(Long id) {
+        return repository.findReservationsByUserEmail(id);
     }
 
     @Override

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,9 +30,12 @@ public class Customer {
     @Column( nullable = false )
     private String name;
 
+    @Version
+    @ColumnDefault("0")
+    private long version;
 
-    @OneToOne(mappedBy = "customer") // Relazione definita in Customer
-    @JoinColumns({@JoinColumn(name = "credentials_id")})
+
+    @OneToOne(fetch = FetchType.LAZY , mappedBy = "customer", cascade = CascadeType.ALL)
     private Credentials credentials;
 
     @NotNull

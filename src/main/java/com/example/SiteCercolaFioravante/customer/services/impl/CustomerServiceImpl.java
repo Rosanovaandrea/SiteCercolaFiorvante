@@ -6,6 +6,7 @@ import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository repository;
@@ -57,8 +59,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer) {
         Customer customerDB = repository.findById(customer.id()).orElse(null);
-        if(customerDB == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"utente non esistennte");
-        if(customerDB.getRole() == CustomerRole.ADMIN) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi modificare un admin");
+        if (customerDB == null)
+        {
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"utente non esistente");
+        }
+        if(customerDB.getRole() == CustomerRole.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi modificare un admin");
+        }
         mapper.fromDtoEditAdminToCustomer(customer,customerDB);
 
 
@@ -73,22 +81,30 @@ public class CustomerServiceImpl implements CustomerService {
 
     }
 
-
     @Override
-    public Customer getCustomerFromEmailReservation(String email) {
-        Customer customer = repository.findCustomerByEmail(email).orElse(null);
-        if(customer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"cliente non esistente");
-        if(customer.getRole() == CustomerRole.ADMIN) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi inserire una prenotazione su di un admin");
-        return  customer;
+    public Customer getCustomerById(Long id){
+        return repository.findById(id).orElse(null);
     }
 
     @Override
     public boolean deleteCustomer(Long id) {
 
-        if(!repository.existsById(id))
-            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"cliente non esistente");
+        Customer customerToDelete = repository.findById(id).orElse(null);
 
-        repository.deleteById(id);
+
+
+            if(customerToDelete != null) {
+                log.warn("si è tentato di cancellare un utente admim");
+                throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"operazione non valida");
+            }
+
+            if(customerToDelete.getRole().equals(CustomerRole.ADMIN)){
+                log.warn("si è tentato di cancellare un utente non esistente");
+                throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"operazione non valida");
+                }
+
+
+            repository.deleteById(id);
 
         return true;
     }
@@ -96,20 +112,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerSafeProjection getCustomerFromID(Long id) {
         CustomerSafeProjection customer = repository.findCustomerDtoSafeByID(id).orElse(null);
-        if(customer == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"cliente non trovato");
+        if (customer == null) {
+            log.warn("si è cercato di ottenere il cliente con un id non esistente");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"cliente non trovato");
+        }
         return customer;
     }
 
-    @Override
-    public void inserReservationCustomer(Reservation reservation) {
 
-        Customer customerDb = reservation.getCustomer();
-
-        if(customerDb.getReservations() == null)
-            customerDb.setReservations(new LinkedList<Reservation>());
-
-        customerDb.getReservations().add(reservation);
-        repository.saveAndFlush(customerDb);
-
-    }
 }

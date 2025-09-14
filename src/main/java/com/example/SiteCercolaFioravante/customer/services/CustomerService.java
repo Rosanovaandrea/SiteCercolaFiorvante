@@ -19,12 +19,11 @@ public interface CustomerService {
 
     boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer);
 
-    Customer getCustomerFromEmailReservation(String email);
-
     boolean deleteCustomer(Long id);
 
     CustomerSafeProjection getCustomerFromID(Long Id);
 
-    void inserReservationCustomer(Reservation reservation);
+    Customer getCustomerById(Long id);
+
 }
 

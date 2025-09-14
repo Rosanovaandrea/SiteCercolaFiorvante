@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.boot.autoconfigure.web.WebProperties;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "day_date", "hour" } ) } )
@@ -26,6 +25,10 @@ public class Reservation {
     @ManyToOne
     @JoinColumn( name = "service_id", nullable = false )
     private Service service;
+
+    @Version
+    @ColumnDefault("0")
+    private long version;
 
     @ManyToOne
     @JoinColumn( name = "customer_id", nullable = false )

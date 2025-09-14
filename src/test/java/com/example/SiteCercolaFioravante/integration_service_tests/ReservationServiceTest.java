@@ -92,9 +92,9 @@ public class ReservationServiceTest {
                 "massaggio rilassante");
 
         servService.insertService(serviceDtoCompleteUpload);
-        String email = customerService.getCustomerByNameOrSurname(customer.name()).get(0).email();
+        String customerId = customerService.getCustomerByNameOrSurname(customer.name()).get(0).customerId();
 
-        ReservationDtoInsert reservationDtoInsert = new ReservationDtoInsert(email,"massaggio", LocalDate.now(), 2);
+        ReservationDtoInsert reservationDtoInsert = new ReservationDtoInsert(customerId,"massaggio", LocalDate.now(), 2);
 
         reservationService.insertReservation(reservationDtoInsert);
 

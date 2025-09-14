@@ -7,7 +7,6 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +24,10 @@ public class Day {
 
     @ColumnDefault( "false" )
     private boolean isAvailable;
+
+    @Version
+    @ColumnDefault("0")
+    private long version;
 
     @Size( max = 8 )
     @ElementCollection

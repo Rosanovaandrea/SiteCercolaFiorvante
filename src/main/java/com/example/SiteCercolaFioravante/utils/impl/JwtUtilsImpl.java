@@ -5,7 +5,7 @@ package com.example.SiteCercolaFioravante.utils.impl;
 import com.auth0.jwt.*;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.SiteCercolaFioravante.TokenType;
+import com.example.SiteCercolaFioravante.customer.TokenType;
 import com.example.SiteCercolaFioravante.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ public class JwtUtilsImpl implements JwtUtils {
 
     public String createResetPasswordToken(String tokenId , String subjectId) {
 
-        return createLongLiveToken(tokenId,subjectId,TokenType.RESET_PASSWORD,5);
+        return createLongLiveToken(tokenId,subjectId, TokenType.RESET_PASSWORD,5);
     }
 
     public String createRefreshToken(String tokenId , String subjectId) {

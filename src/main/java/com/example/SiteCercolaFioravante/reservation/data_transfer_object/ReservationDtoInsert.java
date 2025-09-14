@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 
 public record ReservationDtoInsert(
-                                    @NotNull String email,
+                                    @NotNull Long customerId,
                                     @NotNull String serviceName,
                                     @NotNull LocalDate date,
                                     @NotNull int hour
