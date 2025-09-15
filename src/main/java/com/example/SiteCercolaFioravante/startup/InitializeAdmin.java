@@ -25,7 +25,7 @@ public class InitializeAdmin {
     public InitializeAdmin(@Autowired CustomerRepository repository,
                            @Value("${admin.name}") String name,
                            @Value("${admin.surname}")String surname,
-                           @Value("${admin.customerId}")String email,
+                           @Value("${admin.email}")String email,
                            @Value("${admin.password}")String password,
                            @Value("${admin.number}")String number) {
         this.repository = repository;
@@ -45,6 +45,7 @@ public class InitializeAdmin {
             Credentials credentials = new Credentials();
             credentials.setEmail(email);
             credentials.setPassword(BCrypt.hashpw(password,BCrypt.gensalt()));
+            credentials.setCustomer(customer);
             customer.setCredentials(credentials);
             customer.setPhoneNumber(number);
             customer.setRole(CustomerRole.ADMIN);

@@ -23,10 +23,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     )
     List<CustomerDtoListProjection> getCustomerByNameOrSurname(@Param("query") String query);
 
-    @Query("SELECT c FROM Customer c JOIN FETCH c.credentials WHERE c.credentials.customerId = :customerId")
-    Optional<Customer> findCustomerByEmail(@Param("customerId") String email );
+    @Query("SELECT c FROM Customer c JOIN FETCH c.credentials WHERE c.credentials.email = :email")
+    Optional<Customer> findCustomerByEmail(@Param("email") String email );
 
     Optional<Customer> findCustomerByRole( CustomerRole role );
+
+    boolean existsByPhoneNumber(String phoneNumber);
 
     @Query("SELECT ctm.id as id, ctm.surname as surname, ctm.name as name, ctm.phoneNumber From Customer ctm WHERE ctm.id = :id AND ctm.role !='ADMIN' " )
     Optional<CustomerSafeProjection> findCustomerDtoSafeByID(@Param("id") Long id);

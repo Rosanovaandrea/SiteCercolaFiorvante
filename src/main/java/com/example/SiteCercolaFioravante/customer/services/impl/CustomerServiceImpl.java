@@ -26,7 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDtoListProjection> getCustomerByNameOrSurname(String nameSurname) {
-        if(nameSurname.isBlank()) return Collections.emptyList();
+        if(nameSurname == null || nameSurname.isBlank()) return Collections.emptyList();
         return repository.getCustomerByNameOrSurname(nameSurname);
     }
 
@@ -36,17 +36,22 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public boolean insertCustomerFromAdmin(CustomerDtoSafe customer) {
 
+
+
         Customer customerDB = mapper.fromDtoSafeToCustomer(customer);
+
+        if(repository.existsByPhoneNumber(customerDB.getPhoneNumber())) {
+            log.warn("si è cercato di inserire un utente con un numero già esistente");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
+        }
 
         customerDB.setRole(CustomerRole.CUSTOMER_IN_LOCO);
 
-        try {
+
             repository.save(customerDB);
             repository.flush();
             return true;
-        }catch (DataIntegrityViolationException e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
-        }
+
 
 
     }
@@ -59,25 +64,29 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public boolean editCustomerFromAdmin(CustomerDtoEditAdmin customer) {
         Customer customerDB = repository.findById(customer.id()).orElse(null);
-        if (customerDB == null)
-        {
 
+        if (customerDB == null) {
+            log.warn("si è cercato di modificare un utente non esisstente");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"utente non esistente");
         }
+
         if(customerDB.getRole() == CustomerRole.ADMIN) {
+            log.warn("si è cercato di modificare un utente admin");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi modificare un admin");
         }
+
         mapper.fromDtoEditAdminToCustomer(customer,customerDB);
 
+        if(repository.existsByPhoneNumber(customerDB.getPhoneNumber())) {
+            log.warn("si è cercato di modificare un utente con un numero già esistente");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
+        }
 
-        try {
             repository.save(customerDB);
             repository.flush();
             return true;
 
-        }catch (DataIntegrityViolationException e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"numero di telefono già in uso");
-        }
+
 
     }
 
@@ -93,13 +102,13 @@ public class CustomerServiceImpl implements CustomerService {
 
 
 
-            if(customerToDelete != null) {
-                log.warn("si è tentato di cancellare un utente admim");
+            if(customerToDelete == null) {
+                log.warn("si è tentato di cancellare un utente non esistente");
                 throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"operazione non valida");
             }
 
             if(customerToDelete.getRole().equals(CustomerRole.ADMIN)){
-                log.warn("si è tentato di cancellare un utente non esistente");
+                log.warn("si è tentato di cancellare un utente admim");
                 throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"operazione non valida");
                 }
 

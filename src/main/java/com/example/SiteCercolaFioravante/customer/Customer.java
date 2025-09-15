@@ -36,6 +36,7 @@ public class Customer {
 
 
     @OneToOne(fetch = FetchType.LAZY , mappedBy = "customer", cascade = CascadeType.ALL)
+    @JoinColumn(name = "credentials_id")
     private Credentials credentials;
 
     @NotNull
