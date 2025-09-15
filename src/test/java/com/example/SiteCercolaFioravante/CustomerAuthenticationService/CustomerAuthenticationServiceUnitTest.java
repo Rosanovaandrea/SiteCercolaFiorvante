@@ -31,7 +31,6 @@ public class CustomerAuthenticationServiceUnitTest {
     private AuthenticationStaticLibraryWrapper wrapper;
     private JwtUtils jwtUtils;
     private CustomerRepository repository;
-    private MapperCustomer mapper;
     private JavaMailSender emailSender;
     private CustomerAuthenticationServiceImpl service;
 
@@ -40,9 +39,8 @@ public class CustomerAuthenticationServiceUnitTest {
         wrapper= Mockito.mock(AuthenticationStaticLibraryWrapper.class);
         jwtUtils = Mockito.mock(JwtUtils.class);
         repository = Mockito.mock(CustomerRepository.class);
-        mapper = Mockito.mock(MapperCustomer.class);
         emailSender = Mockito.mock(JavaMailSender.class);
-        service = Mockito.spy(new CustomerAuthenticationServiceImpl(wrapper,jwtUtils,repository,mapper,emailSender));
+        service = Mockito.spy(new CustomerAuthenticationServiceImpl(wrapper,jwtUtils,repository,emailSender));
     }
 
     @Test

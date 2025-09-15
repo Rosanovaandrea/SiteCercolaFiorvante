@@ -27,7 +27,6 @@ public class ServiceRepositoryTest {
         service = new Service();
         service.setServiceName("massaggio");
         service.setPrice(200.0d);
-        service.setFirstImage("/first");
         HashSet<String> images = new HashSet<String>();
         images.add("/first");
         service.setDescription("massaggio antani");
@@ -36,7 +35,6 @@ public class ServiceRepositoryTest {
         service2 = new Service();
         service2.setServiceName("shampoo");
         service2.setPrice(100.0d);
-        service2.setFirstImage("/second");
         images = new HashSet<String>();
         images.add("/second");
         service2.setDescription("shampoo antani");

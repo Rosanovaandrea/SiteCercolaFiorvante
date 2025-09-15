@@ -2,11 +2,8 @@ package com.example.SiteCercolaFioravante.customer.services.impl;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.SiteCercolaFioravante.customer.Customer;
-import com.example.SiteCercolaFioravante.customer.CustomerRole;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.MapperCustomer;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
 import com.example.SiteCercolaFioravante.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +28,6 @@ public class CustomerAuthenticationServiceImpl implements CustomerAuthentication
     private final AuthenticationStaticLibraryWrapper wrapper;
     private final JwtUtils jwtUtils;
     private final CustomerRepository repository;
-    private final MapperCustomer mapper;
     private final JavaMailSender emailSender;
 
 

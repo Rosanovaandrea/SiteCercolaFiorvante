@@ -1,9 +1,6 @@
 package com.example.SiteCercolaFioravante.customer.services;
 
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.core.Authentication;
 
 public interface CustomerAuthenticationService {

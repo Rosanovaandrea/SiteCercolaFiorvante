@@ -38,7 +38,6 @@ public class Service {
     @ColumnDefault("0")
     private long version;
 
-    private String firstImage;
 
     @Column(nullable = false)
     private double price;

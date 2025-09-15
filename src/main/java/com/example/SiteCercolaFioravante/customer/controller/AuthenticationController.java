@@ -1,6 +1,6 @@
 package com.example.SiteCercolaFioravante.customer.controller;
 
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoComplete;
+
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.LoginDto;
 import com.example.SiteCercolaFioravante.customer.data_transfer_objects.PasswordResetDto;
 import com.example.SiteCercolaFioravante.customer.services.CustomerAuthenticationService;

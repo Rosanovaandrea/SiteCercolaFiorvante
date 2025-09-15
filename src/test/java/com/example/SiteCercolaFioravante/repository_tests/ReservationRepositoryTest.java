@@ -54,7 +54,6 @@ public class ReservationRepositoryTest {
         service = new Service();
         service.setServiceName("massaggio");
         service.setPrice(200.0d);
-        service.setFirstImage("/first");
         HashSet<String> images = new HashSet<String>();
         images.add("/first");
         service.setDescription("massaggio antani");
