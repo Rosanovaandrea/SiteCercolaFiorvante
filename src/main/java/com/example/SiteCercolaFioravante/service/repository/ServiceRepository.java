@@ -12,14 +12,12 @@ import java.util.List;
 @Repository
 public interface ServiceRepository  extends JpaRepository<Service, Long > {
 
-    @Query( "SELECT serv.serviceName as serviceName FROM Service serv WHERE UPPER( serv.serviceName ) LIKE CONCAT('%', UPPER( :serviceName ), '%' ) " )
+    @Query( "SELECT serv.serviceName as serviceName FROM Service serv WHERE UPPER( serv.serviceName ) LIKE CONCAT(UPPER( :serviceName ), '%' ) " )
     List<String> getServiceByName(@Param( "serviceName" ) String serviceName );
 
     @Query( "SELECT serv.serviceName as serviceName FROM Service serv ORDER BY serv.serviceName ASC" )
     List<String> getServiceListByNames();
 
-    @Query("SELECT serv FROM Service serv WHERE serv.serviceName = :serviceName")
-    Service getServiceDtoCompleteByName( @Param( "serviceName" ) String serviceName);
 
     @Query("SELECT serv FROM Service serv WHERE serv.serviceName = :serviceName")
     Service getServiceDbByName(@Param( "serviceName" ) String serviceName );

@@ -3,9 +3,7 @@ package com.example.SiteCercolaFioravante.service.controller;
 import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDtoComplete;
 import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDtoCompleteUpload;
 import com.example.SiteCercolaFioravante.service.services.ServService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +38,8 @@ public class ServiceController {
         }
 
         @GetMapping("/getSingleService")
-        public ResponseEntity<ServiceDtoComplete> getSingleService(@RequestParam String name){
-           return new ResponseEntity<>(servService.getServiceDtoCompleteByName(name), HttpStatus.OK);
+        public ResponseEntity<ServiceDtoComplete> getSingleService(@RequestParam Long id){
+           return new ResponseEntity<>(servService.getServiceDtoCompleteByName(id), HttpStatus.OK);
         }
 
         @PostMapping(path="/updateService", consumes = {"multipart/form-data"})
@@ -55,7 +53,7 @@ public class ServiceController {
 
             //patched to manage the removed images ina an external post value in multiform-data; required a refactor
             if(removedImages!= null && !removedImages.isEmpty()){
-                service = new ServiceDtoCompleteUpload(service.prevServiceName(),service.serviceName(),service.price(), new HashSet<>(removedImages),service.description());
+                service = new ServiceDtoCompleteUpload(service.id(),service.serviceName(),service.price(), new HashSet<>(removedImages),service.description());
             }
             servService.updateService(service,images);
             return new ResponseEntity<>(true, HttpStatus.OK);

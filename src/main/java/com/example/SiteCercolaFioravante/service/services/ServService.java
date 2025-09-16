@@ -20,7 +20,7 @@ public interface ServService {
 
          List<String> getServiceName(String serviceName);
 
-         ServiceDtoComplete getServiceDtoCompleteByName( String serviceName);
+         ServiceDtoComplete getServiceDtoCompleteByName( Long id);
 
          boolean updateService(ServiceDtoCompleteUpload service,List<MultipartFile> imageToInser);
 

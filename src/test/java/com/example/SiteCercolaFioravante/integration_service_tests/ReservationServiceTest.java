@@ -6,21 +6,15 @@ import com.example.SiteCercolaFioravante.customer.services.CustomerService;
 import com.example.SiteCercolaFioravante.day.repository.DayRepository;
 import com.example.SiteCercolaFioravante.day.services.DayService;
 import com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto;
-import com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDtoInsert;
 import com.example.SiteCercolaFioravante.reservation.repository.ReservationRepository;
 import com.example.SiteCercolaFioravante.reservation.service.ReservationService;
-import com.example.SiteCercolaFioravante.service.data_transfer_object.ImageDto;
-import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDtoCompleteUpload;
 import com.example.SiteCercolaFioravante.service.repository.ServiceRepository;
 import com.example.SiteCercolaFioravante.service.services.ServService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

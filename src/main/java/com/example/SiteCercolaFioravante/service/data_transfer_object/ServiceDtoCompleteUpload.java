@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public record ServiceDtoCompleteUpload(
-        String prevServiceName,
+        Long id,
         @NotNull String serviceName,
         @NotNull float price,
         HashSet<String> imagesDataRemove,

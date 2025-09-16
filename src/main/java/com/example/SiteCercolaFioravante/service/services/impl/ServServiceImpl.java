@@ -7,6 +7,8 @@ import com.example.SiteCercolaFioravante.service.data_transfer_object.ServiceDto
 import com.example.SiteCercolaFioravante.service.repository.ServiceRepository;
 import com.example.SiteCercolaFioravante.service.services.ServService;
 import com.example.SiteCercolaFioravante.service.Service;
+import com.example.SiteCercolaFioravante.utils.FileUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -22,27 +24,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @org.springframework.stereotype.Service
+@Slf4j
 public class ServServiceImpl implements ServService {
 
 
     private final String pathImage;
     private final ServiceRepository repository;
     private final MapperService mapper;
+    private final FileUtils fileUtils;
 
     public ServServiceImpl(
                            @Value("${images.path}") String pathImage,
                            @Autowired ServiceRepository repository,
-                           @Autowired MapperService mapper
+                           @Autowired MapperService mapper,
+                           @Autowired FileUtils fileUtils
                     ) {
                         this.pathImage = pathImage;
                         this.repository = repository;
                         this.mapper = mapper;
+                        this.fileUtils = fileUtils;
                 }
 
 
@@ -68,48 +71,42 @@ public class ServServiceImpl implements ServService {
 
     @Transactional(rollbackFor = {Exception.class})
     @Override
-    public boolean insertService(ServiceDtoCompleteUpload service, List<MultipartFile> imagesDto) {
+    public boolean insertService(ServiceDtoCompleteUpload service, List<MultipartFile> imagesDto)  {
 
-        Service serviceDB = new Service();
-        mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
-        HashSet<String> images = new HashSet<String>();
-        boolean insert = (imagesDto != null && !imagesDto.isEmpty());
+            LinkedHashSet<String> images= null;
 
-        try {
+            Service serviceDb = new Service();
+            mapper.ServiceDtoCompleteUploadToService(service,serviceDb);
 
-            if( insert ) {
-                images = transferToFile(imagesDto);
+            if(imagesDto.isEmpty()){
+                repository.save(serviceDb);
+                return true;
             }
 
+            if(imagesDto.size()>4)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"non puoi inserire più di 4 immagini");
 
+            try{
+                images = fileUtils.getImageNames(imagesDto);
+                serviceDb.setImages(images);
+                repository.save(serviceDb);
 
-            serviceDB.setImages(images);
-            repository.save(serviceDB);
-            repository.flush();
+                fileUtils.transferToFile(images,imagesDto,pathImage);
 
+                return true;
 
-
-
-        }
-        catch ( DataAccessException databaseError ){
-
-            try {
-
-              if( insert ) deleteFile( images );
-
-            } catch (IOException e) {
-                throw  databaseError;
+            } catch (Exception e) {
+                log.error("c'è stato un errore nell'inserimento delle immagini del servizio"+e.getMessage());
+                if(images != null) {
+                    try {
+                        fileUtils.reverInsert(images, Path.of(pathImage));
+                    } catch (Exception ex) {
+                        log.error("c'è stato un errore nella pulizia delle immagini in seguito ad un inserimento non riuscito"+e.getMessage());
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore grave nell'inserimento immagini",ex);
+                    }
+                }
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore nell'inserimento immagini",e);
             }
-
-            throw   databaseError;
-
-        }catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-
-        return true;
     }
 
 
@@ -124,11 +121,11 @@ public class ServServiceImpl implements ServService {
     }
 
     @Override
-    public ServiceDtoComplete getServiceDtoCompleteByName(String serviceName) {
-        Service serviceDB = repository.getServiceDtoCompleteByName(serviceName);
+    public ServiceDtoComplete getServiceDtoCompleteByName(Long id) {
+        Service serviceDB = repository.getReferenceById(id);
         HashSet<String>  images = new HashSet<String>();
         if(serviceDB.getImages()!=null) images.addAll(serviceDB.getImages());
-        ServiceDtoComplete serviceDtoComplete = new ServiceDtoComplete(serviceDB.getServiceName(), images,serviceDB.getPrice(),serviceDB.getDescription());;
+        ServiceDtoComplete serviceDtoComplete = new ServiceDtoComplete(serviceDB.getId(), serviceDB.getServiceName(), images,serviceDB.getPrice(),serviceDB.getDescription());;
         return serviceDtoComplete;
     }
 
@@ -136,7 +133,7 @@ public class ServServiceImpl implements ServService {
     @Transactional
     @Override
     public boolean updateService(ServiceDtoCompleteUpload service, List<MultipartFile> imagesToInsert ) {
-        Service serviceDB = repository.getServiceDbByName(service.prevServiceName());
+        Service serviceDB = repository.getReferenceById(service.id());
         mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
         HashSet<String> images =new HashSet<String>( serviceDB.getImages());
         HashSet<String> imagesins = new HashSet<String>();
