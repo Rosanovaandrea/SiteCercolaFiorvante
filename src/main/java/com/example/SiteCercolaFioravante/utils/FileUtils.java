@@ -14,6 +14,6 @@ public interface FileUtils {
 
     void reverInsert(LinkedHashSet<String> deleterFiles,Path pathImage) throws Exception;
 
-    void deleteFiles (LinkedList<String> fileTORemove, String pathImage) throws IOException;
+    void deleteFiles (HashSet<String> fileTORemove, String pathImage) throws IOException;
 
 }

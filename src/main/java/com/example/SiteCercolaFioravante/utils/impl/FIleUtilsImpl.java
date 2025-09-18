@@ -101,7 +101,8 @@ public class FIleUtilsImpl implements FileUtils {
         }
     }
 
-    public void deleteFiles (LinkedList<String> fileTORemove,String pathImage) throws IOException {
+    @Override
+    public void deleteFiles (HashSet<String> fileTORemove,String pathImage) throws IOException {
 
         Path destinationDirectoryPath = fileUtilsStaticWrapper.getPath(pathImage);
 

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class FileUtilsIntegrationTest {
     @Test
     void fileUtilsDeleteFileTest() throws IOException {
 
-        LinkedList<String> fileToRemove = new LinkedList<>();
+        HashSet<String> fileToRemove = new HashSet<>();
         fileToRemove.add("image1.jpg");
         fileToRemove.add("image2.jpg");
         fileToRemove.add("image3.jpg");

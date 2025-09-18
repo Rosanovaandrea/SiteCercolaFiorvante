@@ -312,7 +312,7 @@ public class FIleUtilsUnitTest {
 
             String pathImage ="./pathImage";
 
-            LinkedList<String> fileToRemove = new LinkedList<>();
+            HashSet<String> fileToRemove = new HashSet<>();
             fileToRemove.add("file1.jpg");
             fileToRemove.add("file2.jpg");
 
@@ -346,7 +346,7 @@ public class FIleUtilsUnitTest {
 
         String pathImage ="./pathImage";
 
-        LinkedList<String> fileToRemove = new LinkedList<>();
+        HashSet<String> fileToRemove = new HashSet<>();
         fileToRemove.add("file1.jpg");
         fileToRemove.add("file2.jpg");
 
@@ -369,7 +369,7 @@ public class FIleUtilsUnitTest {
 
         String pathImage ="./pathImage";
 
-        LinkedList<String> fileToRemove = new LinkedList<>();
+        HashSet<String> fileToRemove = new HashSet<>();
         fileToRemove.add("file1.jpg");
         fileToRemove.add("file2.jpg");
         Path imagePthPath = Paths.get(pathImage);
@@ -414,7 +414,7 @@ public class FIleUtilsUnitTest {
 
         String pathImage ="./pathImage";
 
-        LinkedList<String> fileToRemove = new LinkedList<>();
+        HashSet<String> fileToRemove = new HashSet<>();
         fileToRemove.add("file1.jpg");
         fileToRemove.add("file2.jpg");
         Path imagePthPath = Paths.get(pathImage);

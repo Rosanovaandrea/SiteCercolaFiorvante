@@ -133,52 +133,56 @@ public class ServServiceImpl implements ServService {
     @Transactional
     @Override
     public boolean updateService(ServiceDtoCompleteUpload service, List<MultipartFile> imagesToInsert ) {
-        Service serviceDB = repository.getReferenceById(service.id());
-        mapper.ServiceDtoCompleteUploadToService(service,serviceDB);
-        HashSet<String> images =new HashSet<String>( serviceDB.getImages());
-        HashSet<String> imagesins = new HashSet<String>();
 
-        boolean insert = (imagesToInsert != null && !images.isEmpty());
-        boolean remove = (service.imagesDataRemove() != null && !service.imagesDataRemove().isEmpty());
+        LinkedHashSet<String> imagesToInsertNames= null;
+
+        Service serviceDb = repository.findById(service.id()).orElse(null);
+        mapper.ServiceDtoCompleteUploadToService(service,serviceDb);
+
+
+        LinkedHashSet<String> originalImages = (serviceDb.getImages() != null) ? (LinkedHashSet<String>) serviceDb.getImages(): new LinkedHashSet<>();
+
+
+
+            if(imagesToInsert != null && !imagesToInsert.isEmpty()) {
+                imagesToInsertNames = fileUtils.getImageNames(imagesToInsert);
+            for (String image : imagesToInsertNames) {
+                originalImages.add(image);
+            }
+        }
+
+
+        HashSet<String> imageToRemove = service.imagesDataRemove();
+
+        if(imageToRemove != null && !imageToRemove.isEmpty()){
+        for(String image : imageToRemove ){
+            originalImages.remove(image);
+        }}
+
+        serviceDb.setImages(originalImages);
+        repository.save(serviceDb);
+
 
         try {
-
-            if( insert ) {
-                imagesins = transferToFile(imagesToInsert);
-                images.addAll(imagesins);
+            if (imagesToInsertNames != null && !imagesToInsertNames.isEmpty()) {
+                fileUtils.transferToFile(imagesToInsertNames, imagesToInsert, pathImage);
             }
-
-            if( remove ){
-                images.removeAll(service.imagesDataRemove());
+            if (imageToRemove != null && !imageToRemove.isEmpty()) {
+                fileUtils.deleteFiles(imageToRemove, pathImage);
             }
-
-
-            serviceDB.setImages(images);
-            repository.save(serviceDB);
-            repository.flush();
-            //
-
-            if( remove ) deleteFile(service.imagesDataRemove());
-
-        } catch ( DataAccessException databaseError ){
-
-            try {
-
-                if( insert ) deleteFile( imagesins );
-
-            } catch ( IOException catchErrorException ) {
-
-                throw new RuntimeException( catchErrorException );
-
+        }catch (Exception e) {
+            log.error("c'è stato un errore nell'inserimento delle immagini del servizio"+e.getMessage());
+            if(imagesToInsertNames != null && !imagesToInsertNames.isEmpty()) {
+                try {
+                    fileUtils.reverInsert(imagesToInsertNames, Path.of(pathImage));
+                } catch (Exception ex) {
+                    log.error("c'è stato un errore nella pulizia delle immagini in seguito ad un inserimento non riuscito"+e.getMessage());
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore grave nell'inserimento immagini",ex);
+                }
             }
-
-            throw  databaseError;
-
-        } catch ( IOException fileException ) {
-
-            throw new RuntimeException( fileException );
-
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore nell'inserimento immagini",e);
         }
+
 
 
         return true;
