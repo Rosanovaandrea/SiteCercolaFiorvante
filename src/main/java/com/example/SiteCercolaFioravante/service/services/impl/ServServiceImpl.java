@@ -137,6 +137,11 @@ public class ServServiceImpl implements ServService {
         LinkedHashSet<String> imagesToInsertNames= null;
 
         Service serviceDb = repository.findById(service.id()).orElse(null);
+
+        if(serviceDb == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"service non trovato");
+        }
+
         mapper.ServiceDtoCompleteUploadToService(service,serviceDb);
 
 
@@ -146,9 +151,7 @@ public class ServServiceImpl implements ServService {
 
             if(imagesToInsert != null && !imagesToInsert.isEmpty()) {
                 imagesToInsertNames = fileUtils.getImageNames(imagesToInsert);
-            for (String image : imagesToInsertNames) {
-                originalImages.add(image);
-            }
+                originalImages.addAll(imagesToInsertNames);
         }
 
 
@@ -177,10 +180,10 @@ public class ServServiceImpl implements ServService {
                     fileUtils.reverInsert(imagesToInsertNames, Path.of(pathImage));
                 } catch (Exception ex) {
                     log.error("c'è stato un errore nella pulizia delle immagini in seguito ad un inserimento non riuscito"+e.getMessage());
-                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore grave nell'inserimento immagini",ex);
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore grave nell'inserimento immagini");
                 }
             }
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore nell'inserimento immagini",e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"errore nell'inserimento immagini");
         }
 
 
@@ -189,44 +192,7 @@ public class ServServiceImpl implements ServService {
 
     }
 
-    private HashSet<String> transferToFile(List<MultipartFile> imagesToSave) throws IOException {
 
-        HashSet<String> images = new HashSet<String>();
-
-        Path directory = Paths.get(pathImage);
-
-        if (!Files.exists(directory)) {
-            Files.createDirectories(directory);
-        }
-
-
-        for( MultipartFile image : imagesToSave ) {
-
-
-            String name = UUID.randomUUID().toString()+image.getOriginalFilename();
-            Path destinationPath = Paths.get(pathImage, name);
-            InputStream inputStream = image.getInputStream();
-            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            images.add(name);
-
-
-        }
-
-        return images;
-
-    }
-
-    private void deleteFile(HashSet<String> imagesToDelete) throws IOException {
-
-        for( String image : imagesToDelete ) {
-
-            File imageFile = new File(Paths.get(pathImage, image).toUri());
-
-            if(imageFile.exists() && imageFile.isFile() ) imageFile.delete();
-
-        }
-
-    }
 
     //TO-DO have to implement the service elimination
 }

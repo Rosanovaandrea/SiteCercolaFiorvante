@@ -2,6 +2,7 @@ package com.example.SiteCercolaFioravante.day;
 
 import com.example.SiteCercolaFioravante.reservation.Reservation;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -20,9 +21,18 @@ import java.util.Set;
 public class Day {
 
     @Id
-    private LocalDate date;
+    private long id;
 
-    @ColumnDefault( "false" )
+    @NotNull
+    private LocalDate start;
+
+    @NotNull
+    private LocalDate end;
+
+    @NotNull
+    private PeriodType periodType;
+
+    @ColumnDefault( "true" )
     private boolean isAvailable;
 
     @Version
