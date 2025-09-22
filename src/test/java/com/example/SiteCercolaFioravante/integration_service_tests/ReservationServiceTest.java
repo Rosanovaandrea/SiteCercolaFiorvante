@@ -1,9 +1,8 @@
 package com.example.SiteCercolaFioravante.integration_service_tests;
 
-import com.example.SiteCercolaFioravante.customer.data_transfer_objects.CustomerDtoSafe;
 import com.example.SiteCercolaFioravante.customer.repository.CustomerRepository;
 import com.example.SiteCercolaFioravante.customer.services.CustomerService;
-import com.example.SiteCercolaFioravante.day.repository.DayRepository;
+import com.example.SiteCercolaFioravante.day.repository.AgendaDayRepository;
 import com.example.SiteCercolaFioravante.day.services.DayService;
 import com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto;
 import com.example.SiteCercolaFioravante.reservation.repository.ReservationRepository;
@@ -25,7 +24,7 @@ public class ReservationServiceTest {
     private final DayService dayService;
     private  final ServService servService;
     private final CustomerRepository customerRepository;
-    private final DayRepository dayRepository;
+    private final AgendaDayRepository agendaDayRepository;
     private final ServiceRepository serviceRepository;
     private final ReservationRepository reservationRepository;
 
@@ -36,7 +35,7 @@ public class ReservationServiceTest {
             @Autowired DayService dayService,
             @Autowired ServService servService,
             @Autowired CustomerRepository customerRepository,
-            @Autowired DayRepository dayRepository,
+            @Autowired AgendaDayRepository agendaDayRepository,
             @Autowired ServiceRepository serviceRepository,
             @Autowired ReservationRepository reservationRepository
     ) {
@@ -45,7 +44,7 @@ public class ReservationServiceTest {
         this.dayService = dayService;
         this.servService = servService;
         this.customerRepository = customerRepository;
-        this.dayRepository = dayRepository;
+        this.agendaDayRepository = agendaDayRepository;
         this.serviceRepository = serviceRepository;
         this.reservationRepository = reservationRepository;
     }

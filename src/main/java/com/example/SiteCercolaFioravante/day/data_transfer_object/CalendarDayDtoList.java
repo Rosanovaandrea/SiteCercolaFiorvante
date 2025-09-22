@@ -7,8 +7,8 @@ import java.util.HashSet;
 
 public interface CalendarDayDtoList {
     long getId();
-    LocalDate getStart();
-    LocalDate getEnd();
+    LocalDate getStartDay();
+    LocalDate getEndDay();
     PeriodType getPeriodType();
     boolean getIsAvailable();
     HashSet<Integer> getOccupiedHour();

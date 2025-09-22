@@ -10,9 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
-@Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-
+/*
     @Query("SELECT new com.example.SiteCercolaFioravante.reservation.data_transfer_object.ReservationDto" +
             "(e.id, day.date, service.serviceName, ctm.name, ctm.surname, e.hour) FROM Reservation e " +
             "JOIN e.service serv  " +
@@ -44,4 +43,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "JOIN e.day day " +
             "WHERE day.date = :date ")
     List<ReservationDto> findReservationsByLocalDate( @Param( "date" ) LocalDate date );
+
+ */
 }

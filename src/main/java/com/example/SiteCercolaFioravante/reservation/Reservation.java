@@ -1,7 +1,7 @@
 package com.example.SiteCercolaFioravante.reservation;
 
 
-import com.example.SiteCercolaFioravante.day.Day;
+import com.example.SiteCercolaFioravante.day.AgendaDay;
 import com.example.SiteCercolaFioravante.service.Service;
 import com.example.SiteCercolaFioravante.customer.Customer;
 import jakarta.persistence.*;
@@ -11,7 +11,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "day_date", "hour" } ) } )
+@Table(uniqueConstraints = { @UniqueConstraint( columnNames = { "agenda_day_id", "hour_reserved" } ) } )
 @AllArgsConstructor
 @Getter
 @Setter
@@ -35,8 +35,8 @@ public class Reservation {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn( name = "day_date", nullable = false )
-    private Day day;
+    @JoinColumn( name = "agenda_day_id", nullable = false )
+    private AgendaDay agendaDay;
 
     @ColumnDefault( "false" )
     private boolean isCompleted;
@@ -46,8 +46,7 @@ public class Reservation {
 
     @Min( 0 )
     @Max( 7 )
-    @Column(name = "\"hour\"")
-    private int hour;
+    private int hourReserved;
 
 
 }
